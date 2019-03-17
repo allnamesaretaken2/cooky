@@ -4,13 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Recipe {
@@ -19,16 +17,23 @@ public class Recipe {
 	@GeneratedValue
 	private Long id;
 
+	@NotBlank
 	private String name;
 
-	@OneToMany(cascade=CascadeType.ALL)
-	private Set<Ingredient> ingredients = new HashSet<>();
+	private String description;
 
-	@Enumerated(EnumType.STRING)
-	private UnitType unit;
+	/** a cookbook-page or a link */
+	private String source;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<Ingredient> ingredients = new HashSet<>();
 
 	public Recipe() {
 
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public Long getId() {
@@ -43,20 +48,28 @@ public class Recipe {
 		this.name = name;
 	}
 
-	public UnitType getUnit() {
-		return unit;
-	}
-
-	public void setUnit(UnitType unit) {
-		this.unit = unit;
-	}
-
 	public Set<Ingredient> getIngredients() {
 		return ingredients;
 	}
 
 	public void setIngredients(Set<Ingredient> ingredients) {
 		this.ingredients = ingredients;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public String getSource() {
+		return source;
 	}
 
 	public static enum UnitType {

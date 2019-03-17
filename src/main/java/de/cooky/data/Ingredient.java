@@ -6,6 +6,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import de.cooky.definitions.Unit;
+
 @Entity
 public class Ingredient {
 
@@ -18,7 +20,7 @@ public class Ingredient {
 	private Float amount;
 
 	@Enumerated(EnumType.STRING)
-	private UnitType unit;
+	private Unit unit;
 
 	public Ingredient() {
 
@@ -44,16 +46,11 @@ public class Ingredient {
 		this.amount = amount;
 	}
 
-	public UnitType getUnit() {
+	public Unit getUnit() {
 		return unit;
 	}
 
-	public void setUnit(UnitType unit) {
+	public void setUnit(Unit unit) {
 		this.unit = unit;
-	}
-
-	public static enum UnitType {
-
-		KILOGRAMM, GRAMM, SPOONS;
 	}
 }
