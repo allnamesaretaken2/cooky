@@ -1,17 +1,40 @@
+
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="container">
+      <table class="table table-striped">
+        <thead>
+          <th>Name</th>
+        </thead>
+        <tbody>
+          <tr v-for="(recipe,key) in recipes" :key="key"><td>{{recipe.name}}</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
   name: 'app',
-  components: {
-    HelloWorld
+  data: function () {
+    return {
+      recipes: []
+    }
+  },
+  methods: {
+    getRecipeList: async function() {
+      try {
+        const response = await fetch('/rest/recipes/', {method: 'GET', headers:{'Content-Type': 'application/json'}});
+        const json = await response.json();
+        this.recipes = json
+      } catch (error) {
+        console.log("Error: ", error);
+      }
+    }
+  },
+  mounted: function() {
+    this.getRecipeList()
   }
 }
 </script>
