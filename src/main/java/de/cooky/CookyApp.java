@@ -9,9 +9,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.cooky.data.Ingredient;
-import de.cooky.data.Recipe;
-import de.cooky.definitions.Unit;
 import de.cooky.repository.IngredientRepository;
 import de.cooky.repository.RecipeRepository;
 
@@ -33,22 +30,7 @@ public class CookyApp {
 	@RequestMapping("/hugo")
 	String home() {
 		
-		long count1 = repository.count();
-
-		Ingredient s = new Ingredient();
-		
-		s.setUnit(Unit.SPOONS);
-		s.setAmount(2f);
-
-		Recipe r = new Recipe();
-		r.setName("Puffer");
-		r.getIngredients().add(s);
-
-		recipeRepository.save(r);
-
-		em.detach(r);
-
-		return "ingredient: " + r;
+		return "ingredient: ";
 	}
 
 	public static void main(String[] args) {

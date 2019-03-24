@@ -6,5 +6,6 @@ import de.cooky.data.Ingredient;
 
 public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
 
-	
+	Ingredient getByName(String name);
+
 }

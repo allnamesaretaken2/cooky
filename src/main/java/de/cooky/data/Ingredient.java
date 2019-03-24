@@ -1,26 +1,23 @@
 package de.cooky.data;
 
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-import de.cooky.definitions.Unit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name"}, name = "uk_name"))
 public class Ingredient {
 
 	@Id
 	@GeneratedValue
+	@JsonIgnore
 	private Long id;
 
 	private String name;
-
-	private Float amount;
-
-	@Enumerated(EnumType.STRING)
-	private Unit unit;
 
 	public Ingredient() {
 
@@ -38,19 +35,4 @@ public class Ingredient {
 		this.name = name;
 	}
 
-	public Float getAmount() {
-		return amount;
-	}
-
-	public void setAmount(Float amount) {
-		this.amount = amount;
-	}
-
-	public Unit getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Unit unit) {
-		this.unit = unit;
-	}
 }

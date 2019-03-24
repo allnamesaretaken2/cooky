@@ -4,9 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 
@@ -20,13 +22,17 @@ public class Recipe {
 	@NotBlank
 	private String name;
 
+	@Column(length = 4000)
 	private String description;
+
+	private int persons;
 
 	/** a cookbook-page or a link */
 	private String source;
 
 	@OneToMany(cascade = CascadeType.ALL)
-	private Set<Ingredient> ingredients = new HashSet<>();
+	@JoinColumn(name = "id_recipe")
+	private Set<IngredientToRecipe> ingredients = new HashSet<>();
 
 	public Recipe() {
 
@@ -48,11 +54,11 @@ public class Recipe {
 		this.name = name;
 	}
 
-	public Set<Ingredient> getIngredients() {
+	public Set<IngredientToRecipe> getIngredients() {
 		return ingredients;
 	}
 
-	public void setIngredients(Set<Ingredient> ingredients) {
+	public void setIngredients(Set<IngredientToRecipe> ingredients) {
 		this.ingredients = ingredients;
 	}
 
@@ -72,8 +78,11 @@ public class Recipe {
 		return source;
 	}
 
-	public static enum UnitType {
+	public void setPersons(int persons) {
+		this.persons = persons;
+	}
 
-		KILOGRAMM, GRAMM, SPOONS;
+	public int getPersons() {
+		return persons;
 	}
 }
