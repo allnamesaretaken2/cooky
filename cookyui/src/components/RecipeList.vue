@@ -31,13 +31,13 @@ export default {
     ModalAddRecipe
   },
   methods: {
-    getRecipeList: async function() {
+    async getRecipeList() {
       try {
-        const response = await fetch('/rest/recipes/', {method: 'GET', headers:{'Content-Type': 'application/json'}});
-        const json = await response.json();
+        const response = await fetch('/rest/recipes/', {method: 'GET', headers:{'Content-Type': 'application/json'}})
+        const json = await response.json()
         this.recipes = json
       } catch (error) {
-        console.log("Error: ", error);
+        console.log("Error: ", error)
       }
     },
     openModal() {

@@ -15,11 +15,11 @@ export default {
     methods: {
         getRecipe: async function(recipeID) {
             try {
-                const response = await fetch('/rest/recipes/'+recipeID, {method: 'GET', headers:{'Content-Type': 'application/json'}});
-                const json = await response.json();
+                const response = await fetch('/rest/recipes/'+recipeID, {method: 'GET', headers:{'Content-Type': 'application/json'}})
+                const json = await response.json()
                 this.recipe = json
             } catch (error) {
-                console.log("Error: ", error);
+                console.log("Error: ", error)
             }
         },
     },

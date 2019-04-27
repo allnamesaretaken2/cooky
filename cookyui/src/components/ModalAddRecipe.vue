@@ -35,9 +35,9 @@
       </div>
       
       <div class="modal-footer">
-             <button type="button" class="btn btn-outline-info" @click="close()"> Close </button>
+             <button type="button" class="btn btn-outline-info" @click="close()"> Schließen </button>
    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">
-     Submit
+     Abschicken
    </button>
       </div>
     </div>
@@ -59,11 +59,11 @@ export default {
         close() {
             this.$emit('close')
         },
-        submitAndClose: async function(){
+        async submitAndClose() {
             try {
-                await fetch('/rest/recipes/', {method: 'POST', headers:{'Content-Type': 'application/json'}, body: JSON.stringify(this.newRecipe)});
+                await fetch('/rest/recipes/', {method: 'POST', headers:{'Content-Type': 'application/json'}, body: JSON.stringify(this.newRecipe)})
             } catch (error) {
-                console.log("Error: ", error);
+                console.log("Error: ", error)
             }
             this.close()
         },
