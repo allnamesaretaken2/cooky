@@ -10,8 +10,28 @@
       </div>
       
       <div class="modal-body">
-          <label class="col-4">Name</label>
-          <input class="col-8" v-model="newRecipe.name">
+        <div class="form-row">
+          <label class="col-3">Chefkoch-Import</label>
+          <input class="col-6 form-control" v-model="chefkochImport.url">
+          <button type="button" class="col-3 btn btn-outline-primary" @click="chefkoch()">Importieren</button>
+        </div>
+        <div class="form-row">
+          <label class="col-3">Name</label>
+          <input class="col-9 form-control" v-model="newRecipe.name">
+        </div>
+        <div class="form-row">
+          <label class="col-3">Portionen</label>
+          <input class="col-9 form-control" v-model="newRecipe.persons">
+        </div>
+
+        <div class="form-row">
+          <label class="col-3">Beschreibung</label>
+          <textarea class="col-9 form-control" rows="8" v-model="newRecipe.description" />
+        </div>
+        <div class="form-row">
+          <label class="col-3">Quelle</label>
+          <input class="col-9 form-control" v-model="newRecipe.source">
+        </div>
       </div>
       
       <div class="modal-footer">
@@ -31,7 +51,8 @@ export default {
     name: 'modal-add-recipe',
     data: function() {
         return {
-            newRecipe: {}
+            newRecipe: {},
+            chefkochImport: {url: null},
         }
     },
     methods: {
@@ -45,6 +66,16 @@ export default {
                 console.log("Error: ", error);
             }
             this.close()
+        },
+        async chefkoch() {
+            try {
+                const response = await fetch('/rest/recipes/importFromChefkoch', {method: 'POST', headers:{'Content-Type': 'application/json'}, body: JSON.stringify(this.chefkochImport)})
+                const json = await response.json()
+                this.newRecipe = json
+                this.chefkochImport.url = null
+            } catch (error) {
+                console.log("Error: ", error)
+            }
         }
     },
 }
