@@ -47,7 +47,9 @@ public class RecipeController {
 	@GetMapping("{id}")
 	public Recipe getOne(@PathVariable long id) {
 
-		return recipeRepo.getOne(id);
+		Recipe recipe = recipeRepo.findById(id).get();
+		
+		return recipe;
 	}
 
 	@DeleteMapping("{id}")

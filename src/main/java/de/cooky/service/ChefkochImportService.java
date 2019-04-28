@@ -129,7 +129,7 @@ public class ChefkochImportService {
 		}
 
 		if (recipeTitles.size() > 1) {
-			throw new CookyErrorMsg("expected only oneelement with 'page-title'. But there are " + recipeTitles.size());
+			throw new CookyErrorMsg("expected only one element with 'page-title'. But there are " + recipeTitles.size());
 		}
 
 		recipeTitles.first();
