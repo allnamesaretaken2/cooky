@@ -74,6 +74,9 @@ public class ChefkochImportService {
 			Element amount = row.getElementsByTag("td").first();
 			String amountText = amount.text();
 			amountText = amountText.replace(((char) 160) + "", " ");
+			
+			try {
+			
 			String[] amountSplitted = amountText.trim().split(" ");
 
 			if (amountSplitted.length == 1) {
@@ -94,6 +97,12 @@ public class ChefkochImportService {
 
 			} else {
 				// TODO append warning: kann zutat nicht auslesen
+			}
+			}catch (RuntimeException e) {
+
+				//TODO: use logger
+				itr.setAmount(null);
+				itr.setUnit(amountText);
 			}
 
 			// TODO Zutats-Bezeichnung noch einbasteln
@@ -156,16 +165,27 @@ public class ChefkochImportService {
 					"expected only oneelement with 'portionen'. but there are " + portions.size());
 		}
 
-		Recipe r = new Recipe();
+		Recipe recipe = new Recipe();
 
 		// TODO check if there already is a receipe with this name
+		StringBuilder builder = new StringBuilder();
+		
+		textElements.first().childNodes().forEach(child -> {
+			if(child.nodeName().equals("br"))
+			{
+				//linebreaks are, obviously, created with a HTML br-tag
+				builder.append("\n");
+			}else {
+				builder.append(child);
+			}
+		});
 
-		r.setName(recipeTitles.first().text());
-		r.setSource(url);
-		r.setDescription(textElements.first().text());
-		r.setPersons(Integer.parseInt(portions.first().attr("value")));
+		recipe.setName(recipeTitles.first().text());
+		recipe.setSource(url);
+		recipe.setDescription(builder.toString());
+		recipe.setPersons(Integer.parseInt(portions.first().attr("value")));
 
-		return r;
+		return recipe;
 	}
 
 }
