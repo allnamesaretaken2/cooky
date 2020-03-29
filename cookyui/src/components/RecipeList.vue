@@ -9,15 +9,21 @@
           <th class="py-2">Name</th><th></th>
         </thead>
         <tbody>
-          <tr v-for="(recipe,key) in recipes" :key="key"><td><router-link :to="`/recipe/${recipe.id}`">{{recipe.name}}</router-link></td><td class="text-right"><i class="fa fa-edit"></i><i class="fa fa-trash" @click="deleteRecipe(recipe.id)"></i></td></tr>
+          <tr v-for="(recipe,key) in recipes" :key="key">
+            <td><router-link :to="`/recipe/${recipe.id}`">{{recipe.name}}</router-link></td>
+            <td class="text-right"><i class="fa fa-edit"></i><i class="fa fa-trash" @click="deleteRecipe(recipe)"></i></td>
+
+          </tr>
         </tbody>
       </table>
             <modal-add-recipe v-if="showModal" @close="closeModal()"></modal-add-recipe>
+            <modal-delete-recipe ref="modalDeleteRecipe" :callback="getRecipeList"/>
 </div>
 </template>
 
 <script>
 import ModalAddRecipe from './ModalAddRecipe.vue'
+import ModalDeleteRecipe from './ModalDeleteRecipe.vue'
 
 export default {
   name: 'recipe-list',
@@ -28,7 +34,8 @@ export default {
     }
   },
   components: {
-    ModalAddRecipe
+    ModalAddRecipe,
+    ModalDeleteRecipe,
   },
   methods: {
     async getRecipeList() {
@@ -46,15 +53,9 @@ export default {
     closeModal() {
       this.showModal = false
       this.getRecipeList()
+    deleteRecipe(recipe) {
+      this.$refs['modalDeleteRecipe'].show(recipe)
     },
-    async deleteRecipe(recipeID) {
-      try {
-        await fetch('/rest/recipes/'+recipeID, {method: 'DELETE', headers:{'Content-Type': 'application/json'}})
-      } catch (error) {
-        console.log("Error: ", error)
-      }
-      this.getRecipeList()
-    }
   },
   mounted: function() {
     this.getRecipeList()
