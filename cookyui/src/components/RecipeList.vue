@@ -2,7 +2,7 @@
 <div>
       <div class="row mt-4">
         <h4 class="mt-4 col-10">Liste aller Rezepte</h4>
-        <div class="col-2"><button type="button" class="btn btn-primary" @click="openModal()">Hinzufügen</button></div>
+        <div class="col-2"><button type="button" class="btn btn-primary" @click="addRecipe()">Hinzufügen</button></div>
       </div> <!-- row -->
       <table class="table table-hover">
         <thead style="background-color:#AFBC6C">
@@ -16,7 +16,7 @@
           </tr>
         </tbody>
       </table>
-            <modal-add-recipe v-if="showModal" @close="closeModal()"></modal-add-recipe>
+            <modal-add-recipe ref="modalAddRecipe" :callback="getRecipeList"></modal-add-recipe>
             <modal-delete-recipe ref="modalDeleteRecipe" :callback="getRecipeList"/>
 </div>
 </template>
@@ -30,7 +30,6 @@ export default {
   data: function () {
     return {
       recipes: [],
-      showModal: false
     }
   },
   components: {
@@ -47,12 +46,9 @@ export default {
         console.log("Error: ", error)
       }
     },
-    openModal() {
-        this.showModal = true
+    addRecipe() {
+      this.$refs['modalAddRecipe'].show()
     },
-    closeModal() {
-      this.showModal = false
-      this.getRecipeList()
     deleteRecipe(recipe) {
       this.$refs['modalDeleteRecipe'].show(recipe)
     },

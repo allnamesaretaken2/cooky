@@ -1,6 +1,6 @@
 <template> 
 <transition name="modal">
- <div class="modal modal-mask" style="display: block">
+ <div class="modal modal-mask" style="display: block" v-if="showModal">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -35,10 +35,8 @@
       </div>
       
       <div class="modal-footer">
-             <button type="button" class="btn btn-outline-info" @click="close()"> Schließen </button>
-   <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">
-     Abschicken
-   </button>
+        <button type="button" class="btn btn-outline-info" @click="showModal = false">Schließen</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">Abschicken</button>
       </div>
     </div>
   </div>
@@ -51,13 +49,19 @@ export default {
     name: 'modal-add-recipe',
     data: function() {
         return {
+            showModal: false,
             newRecipe: {},
             chefkochImport: {url: null},
         }
     },
+    props: {
+      callback: {type: Function, required: true}
+    },
     methods: {
-        close() {
-            this.$emit('close')
+        show() {
+            this.newRecipe = {}
+            this.chefkochImport = {url: null}
+            this.showModal = true
         },
         async submitAndClose() {
             try {
@@ -65,7 +69,8 @@ export default {
             } catch (error) {
                 console.log("Error: ", error)
             }
-            this.close()
+            this.callback()
+            this.showModal = false
         },
         async chefkoch() {
             try {
@@ -81,16 +86,3 @@ export default {
 }
 </script>
 
-<style>
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  display: table;
-  transition: opacity .3s ease;
-}
-</style>
