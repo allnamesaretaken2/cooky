@@ -1,6 +1,11 @@
 <template>
 <div>
-    Rezept {{$route.params.id}}
+    <h3 class="mt-2">{{recipe.name}}</h3>
+    <p>Personen: {{recipe.persons}}<br/>Dauer: <br/><span v-if="recipe.source">Quelle: {{recipe.source}}</span></p>
+    <ul>
+        <li v-for="(ingredient, key) in recipe.ingredients" :key="key">{{ingredient}}</li>
+    </ul>
+    <span style="white-space: pre;">{{recipe.description}}</span>
 </div>
 </template>
 
