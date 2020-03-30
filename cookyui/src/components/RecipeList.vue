@@ -11,7 +11,7 @@
         <tbody>
           <tr v-for="(recipe,key) in recipes" :key="key">
             <td><router-link :to="`/recipe/${recipe.id}`">{{recipe.name}}</router-link></td>
-            <td class="text-right"><i class="fa fa-edit"></i><i class="fa fa-trash" @click="deleteRecipe(recipe)"></i></td>
+            <td class="text-right"><i class="fa fa-trash" @click="deleteRecipe(recipe)"></i></td>
 
           </tr>
         </tbody>

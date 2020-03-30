@@ -1,7 +1,7 @@
 
 <template>
   <div id="app">
-    <div class="container" style="width:960px">
+    <div class="container">
       <h1 class="text-right mt-3" style="color:#005B4C">cooky</h1>
       <div class="row border-top border-bottom py-2" style="border-color:#005B4C !important;">
         <div class="col">
