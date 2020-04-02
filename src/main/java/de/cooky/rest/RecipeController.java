@@ -60,7 +60,7 @@ public class RecipeController {
 	@PostMapping
 	public ResponseEntity<Recipe> create(@RequestBody Recipe recipe) {
 
-		Recipe saved = recipeService.save(recipe);
+		Recipe saved = recipeService.create(recipe);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saved.getId())
 				.toUri();
@@ -71,16 +71,9 @@ public class RecipeController {
 	@PutMapping("{id}")
 	public ResponseEntity<Object> update(@RequestBody Recipe recipe, @PathVariable long id) {
 
-		Optional<Recipe> optional = recipeRepo.findById(id);
+		Recipe updated = recipeService.update(recipe, id);
 
-		if (!optional.isPresent())
-			return ResponseEntity.notFound().build();
-
-		recipe.setId(id);
-
-		recipeRepo.save(recipe);
-
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.accepted().body(updated);
 	}
 
 	@PostMapping("/importFromChefkoch")
