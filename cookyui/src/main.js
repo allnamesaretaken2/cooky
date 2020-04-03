@@ -6,12 +6,12 @@ import 'font-awesome/css/font-awesome.css'
 
 Vue.use(VueRouter)
 const router = new VueRouter({
-  routes // short for `routes: routes`
+    routes, // short for `routes: routes`
 })
 
 Vue.config.productionTip = false
 
 new Vue({
-  render: h => h(App),
-  router
+    render: h => h(App),
+    router,
 }).$mount('#app')
