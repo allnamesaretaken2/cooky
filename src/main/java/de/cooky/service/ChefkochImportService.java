@@ -3,6 +3,7 @@ package de.cooky.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +51,7 @@ public class ChefkochImportService {
 	}
 
 	private Set<IngredientToRecipe> createTemporaryIngredients(Document doc) {
-		Elements ingredientTable = doc.getElementsByAttributeValue("class", "incredients");
+		Elements ingredientTable = doc.getElementsByAttributeValue("class", "ingredients table-header");
 
 		if (ingredientTable.isEmpty()) {
 			throw new CookyErrorMsg("expected at least one element with 'ingredients'");
@@ -131,27 +132,34 @@ public class ChefkochImportService {
 
 	private Recipe createTemporaryRecipe(Document doc, String url) {
 
-		Elements recipeTitles = doc.getElementsByAttributeValue("class", "page-title");
+		Elements recipeTitles = doc.getElementsByTag("h1");
 
 		if (recipeTitles.isEmpty()) {
-			throw new CookyErrorMsg("expected at least one element with 'page-title'");
+			throw new CookyErrorMsg("expected at least one element with tag-type 'h1'");
 		}
 
 		if (recipeTitles.size() > 1) {
-			throw new CookyErrorMsg("expected only one element with 'page-title'. But there are " + recipeTitles.size());
+			throw new CookyErrorMsg("expected only one element with tag-type 'h1'. But there are " + recipeTitles.size());
 		}
 
-		recipeTitles.first();
 
-		Elements textElements = doc.getElementsByAttributeValue("id", "rezept-zubereitung");
+		Elements textElements = doc.getElementsByTag("article");
 
 		if (textElements.isEmpty()) {
-			throw new CookyErrorMsg("expected at least one element with 'rezept-zubereitung'");
+			throw new CookyErrorMsg("expected at least one element with 'article'");
 		}
 
-		if (textElements.size() > 1) {
-			throw new CookyErrorMsg(
-					"expected only oneelement with 'rezept-zubereitung'. but there are " + textElements.size());
+		Element textElement = textElements.stream().filter(element -> {
+			Elements elementsByTag = element.getElementsByTag("h2");
+			if(!elementsByTag.isEmpty()) {
+				return elementsByTag.first().text().compareTo("Zubereitung") == 0;	
+			}else {
+				return false;
+			}
+		}).findFirst().orElse(null);
+
+		if(textElement == null) {
+			throw new CookyErrorMsg("Could not find text element containing the recipe text");
 		}
 		
 		Elements portions = doc.getElementsByAttributeValue("name", "portionen");
@@ -162,7 +170,7 @@ public class ChefkochImportService {
 
 		if (portions.size() > 1) {
 			throw new CookyErrorMsg(
-					"expected only oneelement with 'portionen'. but there are " + portions.size());
+					"expected only one element with 'portionen'. but there are " + portions.size());
 		}
 
 		Recipe recipe = new Recipe();
@@ -170,7 +178,8 @@ public class ChefkochImportService {
 		// TODO check if there already is a receipe with this name
 		StringBuilder builder = new StringBuilder();
 		
-		textElements.first().childNodes().forEach(child -> {
+		textElement = textElement.getElementsByAttributeValue("class", "ds-box").first();
+		textElement.childNodes().forEach(child -> {
 			if(child.nodeName().equals("br"))
 			{
 				//linebreaks are, obviously, created with a HTML br-tag

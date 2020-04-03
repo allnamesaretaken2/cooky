@@ -30,7 +30,7 @@ public class Recipe {
 	/** a cookbook-page or a link */
 	private String source;
 
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "id_recipe")
 	private Set<IngredientToRecipe> ingredients = new HashSet<>();
 
