@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,10 +40,15 @@ public class RecipeController {
 	@Autowired
 	private ChefkochImportService chefkochImportService;
 
-	@GetMapping
-	public List<Recipe> getAll() {
+	@GetMapping()
+	public List<Recipe> getAll(@RequestParam(required = false) String name) {
 
-		return recipeRepo.findAll();
+		if(StringUtils.isEmpty(name))
+		{
+			return recipeRepo.findAll();
+		}else {
+			return recipeRepo.findByNameContainingIgnoreCase(name);
+		}
 	}
 
 	@GetMapping("{id}")
@@ -51,7 +58,7 @@ public class RecipeController {
 		
 		return recipe;
 	}
-
+	
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable long id) {
 		recipeRepo.deleteById(id);
