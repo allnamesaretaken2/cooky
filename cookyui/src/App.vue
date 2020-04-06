@@ -7,8 +7,7 @@
                 <div class="col">
                     <div class="row py-2" style="background-color:#005B4C; color:#FBFAF0;">
                         <div class="col-2"><router-link to="/">Alle Rezepte</router-link></div>
-                        <div class="col-7">Kalender</div>
-                        <div class="col-3 text-right"><input type="text" class="w-100" style="background-color:#fbfaf0"></div>
+                        <div class="col-10">Kalender</div>
                     </div>
                 </div>
             </div> <!-- header -->
@@ -29,15 +28,5 @@ export default {
 @import './styles/custom-bootstrap.scss';
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
 body {background-color:#FBFAF0}
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  display: table;
-  transition: opacity .3s ease;
-}
+
 </style>

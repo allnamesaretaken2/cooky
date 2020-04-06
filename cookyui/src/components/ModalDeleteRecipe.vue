@@ -1,41 +1,43 @@
 <template>
-    <transition name="modal">
-        <div v-show="showModal" class="modal modal-mask" style="display: block">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Rezept wirklich löschen?</h4>
-                    </div>
 
-                    <div class="modal-body">Rezept "{{ recipe.name }}" wirklich löschen?
-                    </div>
+    <baseModal ref="baseModal">
+        <template v-slot:header>
+            Rezept löschen
+        </template>
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-info" @click="showModal = false">Nein</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="deleteRecipe()">Ja</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </transition>
+        <template v-slot:body>
+            Rezept "{{ recipe.name }}" wirklich löschen?
+        </template>
+
+        <template v-slot:footer>
+            <button type="button" class="btn btn-outline-info" @click="$refs.baseModal.close()">Nein</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" @click="deleteRecipe()">Ja</button>
+        </template>
+    </baseModal>
+
 </template>
 
 <script>
+
+import baseModal from './Modal.vue'
+
 export default {
     name: 'ModalDeleteRecipe',
+
+    components: { baseModal },
+
     props: {
         callback: { type: Function, required: true },
     },
     data: function () {
         return {
             recipe: { name: '' },
-            showModal: false,
         }
     },
     methods: {
         show (recipe) {
             this.recipe = recipe
-            this.showModal = true
+            this.$refs.baseModal.show()
         },
         async deleteRecipe () {
             try {
@@ -44,12 +46,8 @@ export default {
                 console.log('Error: ', error)
             }
             this.callback()
-            this.showModal = false
+            this.$refs.baseModal.close()
         },
     },
 }
 </script>
-
-<style>
-
-</style>

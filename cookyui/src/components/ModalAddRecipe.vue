@@ -1,58 +1,56 @@
 <template>
-    <transition name="modal">
-        <div v-if="showModal" class="modal modal-mask" style="display: block">
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">
-                            Rezept hinzufügen
-                        </h4>
-                    </div>
 
-                    <div class="modal-body">
-                        <div class="form-row">
-                            <label class="col-3">Chefkoch-Import</label>
-                            <input v-model="chefkochImport.url" class="col-6 form-control">
-                            <button type="button" class="col-3 btn btn-outline-primary" @click="chefkoch()">Importieren</button>
-                        </div>
-                        <div class="form-row">
-                            <label class="col-3">Name</label>
-                            <input v-model="newRecipe.name" class="col-9 form-control">
-                        </div>
-                        <div class="form-row">
-                            <label class="col-3">Portionen</label>
-                            <input v-model="newRecipe.persons" class="col-9 form-control">
-                        </div>
+    <baseModal ref="baseModal">
+        <template v-slot:header>
+            Rezept hinzufügen
+        </template>
 
-                        <div class="form-row">
-                            <label class="col-3">Beschreibung</label>
-                            <textarea v-model="newRecipe.description" class="col-9 form-control" rows="8" />
-                        </div>
-                        <div class="form-row">
-                            <label class="col-3">Quelle</label>
-                            <input v-model="newRecipe.source" class="col-9 form-control">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-info" @click="showModal = false">Schließen</button>
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">Abschicken</button>
-                    </div>
-                </div>
+        <template v-slot:body>
+            <div class="form-row">
+                <label class="col-3">Chefkoch-Import</label>
+                <input v-model="chefkochImport.url" class="col-6 form-control">
+                <button type="button" class="col-3 btn btn-outline-primary" @click="chefkoch()">Importieren</button>
             </div>
-        </div>
-    </transition>
+            <div class="form-row">
+                <label class="col-3">Name</label>
+                <input v-model="newRecipe.name" class="col-9 form-control">
+            </div>
+            <div class="form-row">
+                <label class="col-3">Portionen</label>
+                <input v-model="newRecipe.persons" class="col-9 form-control">
+            </div>
+
+            <div class="form-row">
+                <label class="col-3">Beschreibung</label>
+                <textarea v-model="newRecipe.description" class="col-9 form-control" rows="8" />
+            </div>
+            <div class="form-row">
+                <label class="col-3">Quelle</label>
+                <input v-model="newRecipe.source" class="col-9 form-control">
+            </div>
+        </template>
+
+        <template v-slot:footer>
+            <button type="button" class="btn btn-outline-info" @click="$refs.baseModal.close()">Schließen</button>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">Abschicken</button>
+        </template>
+    </baseModal>
 </template>
 
 <script>
+
+import baseModal from './Modal.vue'
+
 export default {
     name: 'ModalAddRecipe',
+
+    components: { baseModal },
+
     props: {
         callback: { type: Function, required: true },
     },
     data: function () {
         return {
-            showModal: false,
             newRecipe: {},
             chefkochImport: { url: null },
         }
@@ -61,7 +59,7 @@ export default {
         show () {
             this.newRecipe = {}
             this.chefkochImport = { url: null }
-            this.showModal = true
+            this.$refs.baseModal.show()
         },
         async submitAndClose () {
             try {
@@ -70,8 +68,9 @@ export default {
                 console.log('Error: ', error)
             }
             this.callback()
-            this.showModal = false
+            this.$refs.baseModal.close()
         },
+
         async chefkoch () {
             try {
                 const response = await fetch('/rest/recipes/importFromChefkoch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.chefkochImport) })
