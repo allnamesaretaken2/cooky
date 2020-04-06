@@ -4,6 +4,8 @@
             <h4 class="mt-4 col-10">Liste aller Rezepte</h4>
             <div class="col-2"><button type="button" class="btn btn-primary" @click="addRecipe()">Hinzufügen</button></div>
         </div> <!-- row -->
+        <input v-model="searchText" type="text" class="w-30">
+        <button class="btn btn-primary" @click="getRecipeList()">Suchen</button>
         <table class="table table-hover">
             <thead style="background-color:#AFBC6C">
                 <th class="py-2">Name</th><th />
@@ -33,6 +35,7 @@ export default {
     data: function () {
         return {
             recipes: [],
+            searchText: null,
         }
     },
     mounted: function () {
@@ -41,7 +44,13 @@ export default {
     methods: {
         async getRecipeList () {
             try {
-                const response = await fetch('/rest/recipes/', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                let url = '/rest/recipes/'
+
+                if (this.searchText) {
+                    url += '?name=' + this.searchText
+                }
+
+                const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
                 const json = await response.json()
                 this.recipes = json
             } catch (error) {

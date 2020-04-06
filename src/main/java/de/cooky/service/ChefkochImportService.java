@@ -3,7 +3,6 @@ package de.cooky.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +11,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,12 +25,16 @@ import de.cooky.exceptions.CookyErrorMsg;
 @Service
 public class ChefkochImportService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ChefkochImportService.class);
+	
 	@Autowired
 	private IngredientService ingredientService;
 
 	@Transactional
 	public Recipe importRecipe(String url) {
 
+		LOG.info("start import of recipe from url " + url);
+		
 		try {
 			new URL(url);//implicit validation of the url
 
@@ -41,10 +46,14 @@ public class ChefkochImportService {
 
 			recipe.setIngredients(itrSet);
 
+			LOG.info("finished import of recipe from url " + url);
+			
 			return recipe;
 
 		} catch (IOException e) {
 
+			LOG.error("import from url " + url + " failed. Reason:");
+			
 			throw new CookyErrorMsg(e);
 		}
 

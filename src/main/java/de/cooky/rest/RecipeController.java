@@ -2,11 +2,8 @@ package de.cooky.rest;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,8 +26,6 @@ import de.cooky.service.RecipeService;
 @RequestMapping("/rest/recipes")
 public class RecipeController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RecipeController.class);
-	
 	@Autowired
 	private RecipeService recipeService; 
 	

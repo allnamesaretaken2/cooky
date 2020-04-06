@@ -30,6 +30,9 @@
             </div>
         </div>
         <div class="row">
+            <label class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+                Zubereitung:
+            </label>
             <div class="col-12 col-sm-10 col-xl-8">
                 <textarea v-if="editMode" v-model="recipe.description" rows="7" class="form-control" />
                 <span v-else style="white-space: pre;">{{ recipe.description }}</span>
