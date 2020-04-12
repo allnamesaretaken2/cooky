@@ -7,7 +7,7 @@
                 <div class="col">
                     <div class="row py-2" style="background-color:#005B4C; color:#FBFAF0;">
                         <div class="col-2"><router-link to="/">Alle Rezepte</router-link></div>
-                        <div class="col-10">Kalender</div>
+                        <div class="col-2"><router-link to="/shoppinglist">Einkaufsliste</router-link></div>
                     </div>
                 </div>
             </div> <!-- header -->

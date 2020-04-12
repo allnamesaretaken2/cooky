@@ -35,7 +35,7 @@
             </label>
             <div class="col-12 col-sm-10 col-xl-8">
                 <textarea v-if="editMode" v-model="recipe.description" rows="7" class="form-control" />
-                <span v-else style="white-space: pre;">{{ recipe.description }}</span>
+                <span v-else style="white-space: pre-line;">{{ recipe.description }}</span>
             </div>
         </div>
         <div class="row mt-3">

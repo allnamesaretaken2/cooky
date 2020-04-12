@@ -17,8 +17,16 @@
                 </tr>
             </tbody>
         </table>
+
+        <div v-show="showLoadingSpinner" class="row mt-4">
+            <div class="spinner-border mx-auto" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
         <modal-add-recipe ref="modalAddRecipe" :callback="getRecipeList" />
         <modal-delete-recipe ref="modalDeleteRecipe" :callback="getRecipeList" />
+
     </div>
 </template>
 
@@ -36,6 +44,7 @@ export default {
         return {
             recipes: [],
             searchText: null,
+            showLoadingSpinner: false,
         }
     },
     mounted: function () {
@@ -43,6 +52,10 @@ export default {
     },
     methods: {
         async getRecipeList () {
+            this.recipes = []
+
+            this.showLoadingSpinner = true
+
             try {
                 let url = '/rest/recipes/'
 
@@ -56,6 +69,8 @@ export default {
             } catch (error) {
                 console.log('Error: ', error)
             }
+
+            this.showLoadingSpinner = false
         },
         addRecipe () {
             this.$refs.modalAddRecipe.show()
