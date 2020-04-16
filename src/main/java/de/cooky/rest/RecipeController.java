@@ -2,6 +2,7 @@ package de.cooky.rest;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +28,43 @@ import de.cooky.service.RecipeService;
 public class RecipeController {
 
 	@Autowired
-	private RecipeService recipeService; 
-	
+	private RecipeService recipeService;
+
 	@Autowired
 	private RecipeRepository recipeRepo;
-	
+
 	@Autowired
 	private ChefkochImportService chefkochImportService;
 
 	@GetMapping()
 	public List<Recipe> getAll(@RequestParam(required = false) String name) {
 
-		if(StringUtils.isEmpty(name))
-		{
+		if (StringUtils.isEmpty(name)) {
 			return recipeRepo.findAll();
-		}else {
+		} else {
 			return recipeRepo.findByNameContainingIgnoreCase(name);
 		}
+	}
+
+	@GetMapping("/selected")
+	public List<Recipe> getSelected() {
+		return recipeRepo.findBySelected(true);
+	}
+
+	@PutMapping("/select")
+	public void Selected(@RequestBody Map<Long, Boolean> selectionSettings) {
+
+		recipeService.setSelection(selectionSettings);
 	}
 
 	@GetMapping("{id}")
 	public Recipe getOne(@PathVariable long id) {
 
 		Recipe recipe = recipeRepo.findById(id).get();
-		
+
 		return recipe;
 	}
-	
+
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable long id) {
 		recipeRepo.deleteById(id);
@@ -82,21 +93,20 @@ public class RecipeController {
 	public ResponseEntity<Recipe> importFromChefkoch(@RequestBody Import importObject) {
 
 		Recipe result = chefkochImportService.importRecipe(importObject.url);
-		
+
 		return ResponseEntity.ok(result);
 	}
-	
-	static class Import{
-		
+
+	static class Import {
+
 		String url;
-		
+
 		public void setUrl(String url) {
 			this.url = url;
 		}
-		
+
 		public String getUrl() {
 			return url;
 		}
-		
 	}
 }

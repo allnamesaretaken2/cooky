@@ -1,6 +1,10 @@
 package de.cooky.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -10,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.cooky.data.Ingredient;
+import de.cooky.data.IngredientToRecipe;
 import de.cooky.data.Recipe;
 import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
@@ -23,6 +28,9 @@ public class RecipeService {
 
 	@Autowired
 	private IngredientService ingredientService;
+
+	@Autowired
+	private ShoppingItemService shoppingItemService;
 
 	public Recipe create(Recipe recipe) {
 
@@ -64,8 +72,32 @@ public class RecipeService {
 		updateIngredients(recipe);
 
 		recipe = recipeRepo.save(recipe);
-		
+
 		return recipe;
 
+	}
+
+	public void setSelection(Map<Long, Boolean> newSelectionSettings) {
+
+		Set<Long> recipeIds = newSelectionSettings.keySet();
+
+		if (newSelectionSettings == null || newSelectionSettings.isEmpty()) {
+			throw new CookyErrorMsg("cannot set the selection-flag of recipes. No Ids were given.");
+		}
+
+		List<Recipe> selected = recipeRepo.findByIdIn(recipeIds);
+
+		List<IngredientToRecipe> ingredients = new ArrayList<>();
+
+		selected.forEach(recipe -> {
+			Boolean selectionValue = newSelectionSettings.get(recipe.getId());
+			recipe.setSelected(selectionValue);
+
+			if (selectionValue.booleanValue()) {
+				ingredients.addAll(recipe.getIngredients());
+			}
+		});
+
+		shoppingItemService.enhanceShoppingList(ingredients);
 	}
 }

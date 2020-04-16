@@ -8,7 +8,10 @@
                 </h3>
             </div>
             <div class="col-2 ml-auto text-right">
-                <h4 v-if="editMode"><i class="fa fa-save" @click="saveRecipe()" /></h4>
+                <h4 v-if="editMode">
+                    <button class="btn btn-secondary fa fa-undo" title="Abbrechen" @click="getRecipe()" />
+                    <button class="btn btn-secondary fa fa-save" title="Rezepte speichern" @click="saveRecipe()" />
+                </h4>
                 <h4 v-else><i class="fa fa-edit" @click="editMode=true" /></h4>
             </div>
         </div>
@@ -21,11 +24,36 @@
                 <span v-else>{{ recipe.persons }}</span>
             </div>
         </div>
-        <div class="row">
+        <div v-if="editMode" class="row">
             <div class="col">
                 Zutaten:
+                <table class="table table-hover">
+                    <thead style="background-color:#AFBC6C">
+                        <th class="py-2">Name</th><th />
+                    </thead>
+                    <tbody>
+                        <tr v-for="(ingredient,key) in recipe.ingredients" :key="key">
+                            <input v-model="ingredient.amount" type="number">
+                            <input v-model="ingredient.unit" type="text">
+                            <input v-model="ingredient.ingredient.name" type="text">
+
+                            <td class="text-right"><button type="button" class="btn btn-secondary fa fa-trash" @click="deleteIngredient(ingredient, key)" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-right">
+                    <button class="btn btn-secondary fa fa-trash" @click="addIngredient()">Zutat hinzufügen</button>
+                </div>
+            </div>
+        </div>
+        <div v-else class="row">
+            <div class="col">
                 <ul>
-                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key">{{ ingredient }}</li>
+                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key">
+                        <span v-if="ingredient.amount">{{ ingredient.amount }}</span>
+                        <span v-if="ingredient.unit"> {{ ingredient.unit }}</span>
+                        {{ ingredient.ingredient.name }}
+                    </li>
                 </ul>
             </div>
         </div>
@@ -55,15 +83,17 @@ export default {
     name: 'Recipe',
     data: function () {
         return {
-            recipe: null,
+            recipe: {},
             editMode: false,
         }
     },
     mounted: function () {
-        this.getRecipe(this.$route.params.id)
+        this.getRecipe()
     },
     methods: {
-        getRecipe: async function (recipeID) {
+        async getRecipe () {
+            this.editMode = false
+            const recipeID = this.$route.params.id
             try {
                 const response = await fetch('/rest/recipes/' + recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
                 const json = await response.json()
@@ -72,13 +102,28 @@ export default {
                 console.log('Error: ', error)
             }
         },
-        saveRecipe: async function () {
+
+        async saveRecipe () {
             try {
                 await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
             } catch (error) {
                 console.log('Error: ', error)
             }
             this.editMode = false
+        },
+
+        deleteIngredient (ingredient, key) {
+            this.recipe.ingredients.splice(key, 1)
+        },
+
+        addIngredient () {
+            this.recipe.ingredients.push({
+                amount: 1,
+                unit: '',
+                ingredient: {
+                    name: '',
+                },
+            })
         },
     },
 }

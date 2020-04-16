@@ -112,7 +112,7 @@ export default {
     methods: {
 
         /*
-         * copy the item list to the clopboard by creating a string representation and stuff that one into an hidden text area.
+         * copy the item list to the clipboard by creating a string representation and stuff that one into an hidden text area.
          * Then call the copy function from there and hope that it works
          */
         copyList () {

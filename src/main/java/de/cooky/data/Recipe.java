@@ -34,6 +34,8 @@ public class Recipe {
 	@JoinColumn(name = "id_recipe")
 	private Set<IngredientToRecipe> ingredients = new HashSet<>();
 
+	private boolean selected;
+	
 	public Recipe() {
 
 	}
@@ -84,5 +86,13 @@ public class Recipe {
 
 	public int getPersons() {
 		return persons;
+	}
+	
+	public boolean getSelected() {
+		return this.selected;
+	}
+	
+	public void setSelected(boolean selected) {
+		this.selected = selected;
 	}
 }
