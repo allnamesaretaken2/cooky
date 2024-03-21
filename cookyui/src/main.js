@@ -1,17 +1,15 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import routes from './routes'
 import 'font-awesome/css/font-awesome.css'
 
-Vue.use(VueRouter)
-const router = new VueRouter({
-    routes, // short for `routes: routes`
+const app = createApp(App)
+
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
 })
 
-Vue.config.productionTip = false
-
-new Vue({
-    render: h => h(App),
-    router,
-}).$mount('#app')
+app.use(router)
+app.mount('#app')

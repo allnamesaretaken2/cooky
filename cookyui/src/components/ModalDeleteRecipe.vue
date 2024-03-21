@@ -1,15 +1,15 @@
 <template>
 
     <baseModal ref="baseModal">
-        <template v-slot:header>
+        <template #header>
             Rezept löschen
         </template>
 
-        <template v-slot:body>
+        <template #body>
             Rezept "{{ recipe.name }}" wirklich löschen?
         </template>
 
-        <template v-slot:footer>
+        <template #footer>
             <button type="button" class="btn btn-outline-info" @click="$refs.baseModal.close()">Nein</button>
             <button type="button" class="btn btn-primary" data-dismiss="modal" @click="deleteRecipe()">Ja</button>
         </template>

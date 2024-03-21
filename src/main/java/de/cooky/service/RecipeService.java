@@ -1,23 +1,20 @@
 package de.cooky.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.persistence.EntityNotFoundException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import de.cooky.data.Ingredient;
 import de.cooky.data.IngredientToRecipe;
 import de.cooky.data.Recipe;
 import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -60,9 +57,9 @@ public class RecipeService {
 
 	public Recipe update(Recipe recipe, long id) {
 
-		Optional<Recipe> optional = recipeRepo.findById(id);
+		Long recipePresent = recipeRepo.countById(id);
 
-		if (!optional.isPresent()) {
+		if (recipePresent != 1) {
 			throw new EntityNotFoundException("Cannot update recipe. There is none in the database with id " + id);
 		}
 
@@ -81,7 +78,7 @@ public class RecipeService {
 
 		Set<Long> recipeIds = newSelectionSettings.keySet();
 
-		if (newSelectionSettings == null || newSelectionSettings.isEmpty()) {
+		if (newSelectionSettings.isEmpty()) {
 			throw new CookyErrorMsg("cannot set the selection-flag of recipes. No Ids were given.");
 		}
 
@@ -93,11 +90,25 @@ public class RecipeService {
 			Boolean selectionValue = newSelectionSettings.get(recipe.getId());
 			recipe.setSelected(selectionValue);
 
-			if (selectionValue.booleanValue()) {
+			if (selectionValue) {
 				ingredients.addAll(recipe.getIngredients());
 			}
 		});
 
 		shoppingItemService.enhanceShoppingList(ingredients);
+	}
+
+	public Recipe insertFromString(String ingredientsAsStringBlobb, String recipeName){
+		Set<IngredientToRecipe> ingredients = ingredientService.createIngredientsFromString(ingredientsAsStringBlobb);
+
+		Recipe recipe = recipeRepo.findByName(recipeName);
+
+		if(recipe == null){
+			//TODO throw recipe not found error
+		}
+
+		recipe.getIngredients().addAll(ingredients);
+
+		return recipe;
 	}
 }

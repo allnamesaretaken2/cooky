@@ -23,6 +23,7 @@ import de.cooky.data.Recipe;
 import de.cooky.exceptions.CookyErrorMsg;
 
 @Service
+@Transactional
 public class ChefkochImportService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ChefkochImportService.class);
@@ -30,7 +31,6 @@ public class ChefkochImportService {
 	@Autowired
 	private IngredientService ingredientService;
 
-	@Transactional
 	public Recipe importRecipe(String url) {
 
 		LOG.info("start import of recipe from url " + url);

@@ -13,7 +13,6 @@ module.exports = {
     extends: [
         'plugin:vue/recommended',
         '@vue/standard',
-        '@vue/typescript',
     ],
     rules: {
 
@@ -23,9 +22,11 @@ module.exports = {
             singleline: 'never',
             multiline: 'never',
         }],
-        'vue/max-attributes-per-line': false,
-        'vue/multiline-html-element-content-newline': false,
+        'vue/max-attributes-per-line': 0,
+        'vue/multiline-html-element-content-newline': 0,
         'vue/html-indent': ['error', 4],
-        'vue/singleline-html-element-content-newline': false,
+        'vue/singleline-html-element-content-newline': 0,
+        'vue/multi-word-component-names' : 'off'
+
     },
 }

@@ -17,7 +17,7 @@ public class CookyExceptionHandler {
 
 	@ResponseBody
 	@ExceptionHandler(CookyErrorMsg.class)
-	public ResponseEntity<String> handleCorexException(CookyErrorMsg e) {
+	public ResponseEntity<String> handleCoookyException(CookyErrorMsg e) {
 
 		LOG.error("exception", e);
 

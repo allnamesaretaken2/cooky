@@ -176,12 +176,13 @@ export default {
         },
 
         async addToShoppingList () {
-            var recipeKeys = []
+            const recipeKeys = []
 
             this.selectedRecipes.filter(recipe => {
                 if (recipe.temporarySelected === true) {
                     recipeKeys.push(recipe.id)
                 }
+                return undefined
             })
 
             this.saveTemporarySelection()

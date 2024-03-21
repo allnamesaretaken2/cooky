@@ -78,7 +78,7 @@ public class RecipeController {
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saved.getId())
 				.toUri();
 
-		return ResponseEntity.created(location).body(saved);
+		return ResponseEntity.ok(saved);
 	}
 
 	@PutMapping("{id}")

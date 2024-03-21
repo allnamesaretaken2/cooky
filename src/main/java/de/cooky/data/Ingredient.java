@@ -1,10 +1,6 @@
 package de.cooky.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,7 +9,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Ingredient {
 
 	@Id
-	@GeneratedValue
+	//use this strategy to prevent hibernate from opening new transactions
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@JsonIgnore
 	private Long id;
 

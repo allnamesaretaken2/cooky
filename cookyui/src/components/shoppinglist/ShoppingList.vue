@@ -35,11 +35,11 @@
 
         <!-- Recipe selection popup -->
         <baseModal ref="modalRecipeSelection">
-            <template v-slot:header>
+            <template #header>
                 Rezept auswählen
             </template>
 
-            <template v-slot:body>
+            <template #body>
                 <div class="form-row">
                     <table class="table table-hover">
                         <thead style="background-color:#AFBC6C">
@@ -55,18 +55,18 @@
                 </div>
             </template>
 
-            <template v-slot:footer>
+            <template #footer>
                 <button type="button" class="col-3 btn btn-outline-primary" @click="closeRecipePopup()">okay</button>
             </template>
         </baseModal>
 
         <!-- shopping item edit popup -->
         <baseModal ref="modalItemEdit">
-            <template v-slot:header>
+            <template #header>
                 Neuer Eintrag
             </template>
 
-            <template v-slot:body>
+            <template #body>
                 <label class="m-1">Name</label>
                 <input v-model="itemEdit.name" type="text" class="m-1">
 
@@ -77,7 +77,7 @@
                 <input v-model="itemEdit.unit" type="text" class="m-1">
             </template>
 
-            <template v-slot:footer>
+            <template #footer>
                 <button type="button" class="col-3 btn btn-outline-primary" @click="cancelModalItemEdit()">cancel</button>
                 <button type="button" class="col-3 btn btn-outline-primary" @click="closeModalItemEdit()">okay</button>
             </template>
@@ -139,7 +139,7 @@ export default {
             copyField.select()
 
             try {
-                var successful = document.execCommand('copy')
+                const successful = document.execCommand('copy')
 
                 if (!successful) { alert('Oops, unable to copy') }
             } catch (err) {
@@ -203,7 +203,7 @@ export default {
         },
 
         changeOrder (item, key) {
-            var blorp = this.items
+            const blorp = this.items
 
             this.items = []
 

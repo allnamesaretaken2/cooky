@@ -1,16 +1,13 @@
 package de.cooky.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 public class IngredientToRecipe {
 
 	@Id
-	@GeneratedValue
+	//use this strategy to prevent hibernate from opening new transactions
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne

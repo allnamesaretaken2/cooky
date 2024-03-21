@@ -1,11 +1,11 @@
 <template>
 
     <baseModal ref="baseModal">
-        <template v-slot:header>
+        <template #header>
             Rezept hinzufügen
         </template>
 
-        <template v-slot:body>
+        <template #body>
             <div class="form-row">
                 <label class="col-3">Chefkoch-Import</label>
                 <input v-model="chefkochImport.url" class="col-6 form-control">
@@ -19,7 +19,10 @@
                 <label class="col-3">Portionen</label>
                 <input v-model="newRecipe.persons" class="col-9 form-control">
             </div>
-
+            <div class="form-row">
+                <label class="col-3">Zutaten</label>
+                <textarea v-model="ingredientsAsString" class="col-9 form-control" rows="8" />
+            </div>
             <div class="form-row">
                 <label class="col-3">Beschreibung</label>
                 <textarea v-model="newRecipe.description" class="col-9 form-control" rows="8" />
@@ -30,7 +33,7 @@
             </div>
         </template>
 
-        <template v-slot:footer>
+        <template #footer>
             <button type="button" class="btn btn-outline-info" @click="$refs.baseModal.close()">Schließen</button>
             <button type="button" class="btn btn-primary" data-dismiss="modal" @click="submitAndClose()">Abschicken</button>
         </template>
@@ -52,6 +55,7 @@ export default {
     data: function () {
         return {
             newRecipe: {},
+            ingredientsAsString: '',
             chefkochImport: { url: null },
         }
     },
@@ -61,9 +65,13 @@ export default {
             this.chefkochImport = { url: null }
             this.$refs.baseModal.show()
         },
+
         async submitAndClose () {
             try {
                 await fetch('/rest/recipes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.newRecipe) })
+                const recipeName = this.newRecipe.name
+                await fetch('/rest/ingredients/insertFromString/' + recipeName,
+                    { method: 'POST', headers: { 'Content-Type': 'application/text' }, body: this.ingredientsAsString.replaceAll('\n', ';') })
             } catch (error) {
                 console.log('Error: ', error)
             }

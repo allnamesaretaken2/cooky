@@ -1,12 +1,18 @@
 package de.cooky.service;
 
+import de.cooky.data.Ingredient;
+import de.cooky.data.IngredientToRecipe;
+import de.cooky.repository.IngredientRepository;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import de.cooky.data.Ingredient;
-import de.cooky.repository.IngredientRepository;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
+@Transactional
 public class IngredientService {
 
 	@Autowired
@@ -43,4 +49,63 @@ public class IngredientService {
 		return ing;
 	}
 
+	/**
+	 * Creates a new set of ingredientToRecipe-Objects containing the new ingredients.
+	 */
+    public Set<IngredientToRecipe> createIngredientsFromString(String ingredientsAsStringBlobb) {
+
+		String[] ingredientsAsString = ingredientsAsStringBlobb.split(";");
+
+		Set<IngredientToRecipe> result = new HashSet<>();
+
+		for (String ingAsString : ingredientsAsString) {
+
+			ingAsString = ingAsString.trim();
+
+			String[] ingredientParts = ingAsString.split(" ");
+
+			String ingredientName = null;
+			Float amount = null;
+			String unit = null;
+
+			if(ingredientParts.length == 1){
+				//only the ingredient name is given
+				ingredientName = ingredientParts[0];
+			}
+
+			if(ingredientParts.length == 2){
+				// the name and the number are given (e.g. 3 eggs)
+				String amountAsString = ingredientParts[0];
+				if(!NumberUtils.isCreatable(amountAsString)){
+					//TODO throw exception
+				}
+
+				ingredientName = ingredientParts[1];
+				amount = Float.parseFloat(amountAsString);
+			}
+
+			if(ingredientParts.length == 3){
+				// the name, the unit and the amount are given (e.g. 1 liter milk)
+				String amountAsString = ingredientParts[0];
+				if(!NumberUtils.isCreatable(amountAsString)){
+					//throw exception
+				}
+
+				ingredientName = ingredientParts[2];
+				unit = ingredientParts[1];
+				amount = Float.parseFloat(amountAsString);
+			}
+
+			Ingredient ing = getOrCreateIngredient(ingredientName);
+
+			IngredientToRecipe ingToRecipe = new IngredientToRecipe();
+			ingToRecipe.setIngredient(ing);
+			ingToRecipe.setAmount(amount);
+			ingToRecipe.setUnit(unit);
+
+			result.add(ingToRecipe);
+		}
+
+		return result;
+	}
 }

@@ -9,6 +9,10 @@ import de.cooky.data.Recipe;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
+	Recipe findByName(String name);
+
+	Long countById(Long id);
+
 	List<Recipe> findByNameContainingIgnoreCase(String name);
 	
 	List<Recipe> findBySelected(boolean selected);
