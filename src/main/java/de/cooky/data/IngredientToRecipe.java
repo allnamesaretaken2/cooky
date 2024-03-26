@@ -18,6 +18,9 @@ public class IngredientToRecipe {
 
 	private String unit;
 
+	@Column(name = "sort_order", columnDefinition = "integer default 0 not null")
+	private int order = 0;
+
 	public IngredientToRecipe() {
 
 	}
@@ -48,5 +51,13 @@ public class IngredientToRecipe {
 
 	public Ingredient getIngredient() {
 		return ingredient;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
+	public int getOrder() {
+		return order;
 	}
 }

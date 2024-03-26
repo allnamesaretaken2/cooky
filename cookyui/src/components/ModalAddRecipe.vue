@@ -63,6 +63,7 @@ export default {
         show () {
             this.newRecipe = {}
             this.chefkochImport = { url: null }
+            this.ingredientsAsString = ''
             this.$refs.baseModal.show()
         },
 

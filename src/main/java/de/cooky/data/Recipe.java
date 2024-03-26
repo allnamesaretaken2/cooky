@@ -26,6 +26,7 @@ public class Recipe {
 	private String source;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy("order ASC")
 	@JoinColumn(name = "id_recipe")
 	private Set<IngredientToRecipe> ingredients = new HashSet<>();
 

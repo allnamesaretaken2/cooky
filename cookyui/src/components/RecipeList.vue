@@ -16,7 +16,9 @@
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in recipes" :key="key">
-                        <td><router-link :to="`/recipe/${recipe.id}`">{{ recipe.name }}</router-link></td>
+                        <td @click="openRecipe(recipe.id)">
+                            <h5>{{ recipe.name }}</h5>
+                        </td>
                         <td class="text-right">
                             <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)" />
                             <button type="button" class="btn btn-secondary fa fa-trash" @click="deleteRecipe(recipe)" />
@@ -63,7 +65,6 @@
 
             <button type="button" class="btn btn-secondary" @click="addToShoppingList()">speichern und Zutaten in EK-Liste übernehmen</button>
         </div>
-
     </div>
 
 </template>
@@ -130,6 +131,9 @@ export default {
             this.showLoadingSpinnerSelected = false
         },
 
+        openRecipe (recipeId) {
+            this.$router.push('/recipe/' + recipeId)
+        },
         addRecipe () {
             this.$refs.modalAddRecipe.show()
         },
