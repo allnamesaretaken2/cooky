@@ -38,8 +38,9 @@ public class RecipeService {
 
 	private void updateIngredients(Recipe recipe) {
 
-		recipe.getIngredients().forEach(ingr -> {
-
+		//also recreate the order so that it fixes gaps or errors in the list
+		int counter = 0;
+		for (IngredientToRecipe ingr : recipe.getIngredients()) {
 			Ingredient ingredient = ingr.getIngredient();
 
 			if (ingredient == null) {
@@ -52,7 +53,8 @@ public class RecipeService {
 
 			Ingredient ingredientFromDB = ingredientService.getOrCreateIngredient(ingredient.getName());
 			ingr.setIngredient(ingredientFromDB);
-		});
+			ingr.setOrder(counter++);
+		}
 	}
 
 	public Recipe update(Recipe recipe, long id) {
@@ -98,8 +100,8 @@ public class RecipeService {
 		shoppingItemService.enhanceShoppingList(ingredients);
 	}
 
-	public Recipe insertFromString(String ingredientsAsStringBlobb, String recipeName){
-		Set<IngredientToRecipe> ingredients = ingredientService.createIngredientsFromString(ingredientsAsStringBlobb);
+	public Recipe insertFromString(String ingredientsAsString, String recipeName){
+		Set<IngredientToRecipe> ingredients = ingredientService.createIngredientsFromString(ingredientsAsString);
 
 		Recipe recipe = recipeRepo.findByName(recipeName);
 

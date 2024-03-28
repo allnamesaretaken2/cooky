@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
@@ -56,8 +56,9 @@ public class IngredientService {
 
 		String[] ingredientsAsString = ingredientsAsStringBlobb.split(";");
 
-		Set<IngredientToRecipe> result = new HashSet<>();
+		Set<IngredientToRecipe> result = new LinkedHashSet<>();
 
+		int counter = 0;
 		for (String ingAsString : ingredientsAsString) {
 
 			ingAsString = ingAsString.trim();
@@ -102,6 +103,7 @@ public class IngredientService {
 			ingToRecipe.setIngredient(ing);
 			ingToRecipe.setAmount(amount);
 			ingToRecipe.setUnit(unit);
+			ingToRecipe.setOrder(counter++);
 
 			result.add(ingToRecipe);
 		}

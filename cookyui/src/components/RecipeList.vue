@@ -51,7 +51,9 @@
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in selectedRecipes" :key="key" :class="{'selected':recipe.temporarySelected === true, 'unselected':recipe.temporarySelected === false}">
-                        <td><router-link :to="`/recipe/${recipe.id}`">{{ recipe.name }}</router-link></td>
+                        <td @click="openRecipe(recipe.id)">
+                            <h5>{{ recipe.name }}</h5>
+                        </td>
                         <td class="text-right"><button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="setSelection(recipe, false)" /></td>
                     </tr>
                 </tbody>

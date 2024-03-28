@@ -34,9 +34,9 @@
                         <th class="py-2">Name</th><th />
                     </thead>
                     <tbody ref="ingredientList">
-                        <tr v-for="(ingredient,key) in recipe.ingredients" :key="key" draggable="true" v-bind:id="'ingredient' + key"
+                        <tr v-for="(ingredient,key) in recipe.ingredients" :key="key" draggable="true"
                             @dragstart="startDrag(ingredient)" @drop="finishDrag" @dragenter="changeOrder(ingredient)">
-                            <b>{{ ingredient.order }}  </b>
+                            <b>{{ ingredient.order }}</b>
                             <input v-model="ingredient.amount" type="number">
                             <input v-model="ingredient.unit" type="text">
                             <Combobox v-model="ingredient.ingredient.name" style="display: inline-block" :comboValues="existingIngredients"/>
@@ -50,11 +50,11 @@
                 </div>
             </div>
             <div v-else class="col">
-                <ul>
-                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key">
-                        <span v-if="ingredient.amount">{{ ingredient.amount }}</span>
-                        <span v-if="ingredient.unit"> {{ ingredient.unit }}</span>
-                        {{ ingredient.ingredient.name }}
+                <ul class="no-bullets-for-list">
+                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key" >
+                        <span v-if="ingredient.amount" style="margin-right: 5px;">{{ ingredient.amount }}</span>
+                        <span v-if="ingredient.unit" style="margin-right: 5px;">{{ ingredient.unit }}</span>
+                        <span>{{ ingredient.ingredient.name }}</span>
                     </li>
                 </ul>
             </div>
@@ -69,9 +69,9 @@
             </div>
         </div>
         <div class="row mt-3">
-            <label class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
                 Quelle:
-            </label>
+            </b>
             <div class="col-12 col-sm-7 col-xl-6">
                 <input v-if="editMode" v-model="recipe.source" class="form-control">
                 <span v-else>{{ recipe.source }}</span>
@@ -164,3 +164,11 @@ export default {
     },
 }
 </script>
+
+<style>
+.no-bullets-for-list {
+  list-style-type: none; /* Remove bullets */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margins */
+}
+</style>

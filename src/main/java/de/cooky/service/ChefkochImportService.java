@@ -3,6 +3,7 @@ package de.cooky.service;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,7 +76,7 @@ public class ChefkochImportService {
 
 		Elements rowList = table.getElementsByTag("tr");
 
-		Set<IngredientToRecipe> itrSet = new HashSet<>();
+		Set<IngredientToRecipe> itrSet = new LinkedHashSet<>();
 
 		rowList.forEach(row -> {
 

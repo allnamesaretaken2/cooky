@@ -59,6 +59,7 @@
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
+					<!-- TODO this execution is broken -->
 					<execution>
 						<id>copy Vue.js frontend content</id>
 						<phase>generate-resources</phase>
