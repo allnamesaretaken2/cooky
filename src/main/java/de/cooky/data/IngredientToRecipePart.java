@@ -3,7 +3,7 @@ package de.cooky.data;
 import javax.persistence.*;
 
 @Entity
-public class IngredientToRecipe {
+public class IngredientToRecipePart {
 
 	@Id
 	//use this strategy to prevent hibernate from opening new transactions
@@ -21,7 +21,7 @@ public class IngredientToRecipe {
 	@Column(name = "sort_order", columnDefinition = "integer default 0 not null")
 	private int order = 0;
 
-	public IngredientToRecipe() {
+	public IngredientToRecipePart() {
 
 	}
 

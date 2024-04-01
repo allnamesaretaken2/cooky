@@ -30,9 +30,7 @@ public class ShoppingListController {
 	@PostMapping
 	public List<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
 
-		List<ShoppingItem> saved = shoppingListRepo.saveAll(list);
-
-		return saved;
+        return shoppingListRepo.saveAll(list);
 	}
 	
 	@DeleteMapping("{id}")

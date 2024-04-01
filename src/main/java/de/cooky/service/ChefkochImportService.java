@@ -2,10 +2,10 @@ package de.cooky.service;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.cooky.data.RecipePart;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jsoup.Jsoup;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import de.cooky.data.Ingredient;
-import de.cooky.data.IngredientToRecipe;
+import de.cooky.data.IngredientToRecipePart;
 import de.cooky.data.Recipe;
 import de.cooky.exceptions.CookyErrorMsg;
 
@@ -32,6 +32,9 @@ public class ChefkochImportService {
 	@Autowired
 	private IngredientService ingredientService;
 
+	/**
+	 * Convert a chefkoch-recipe into a cooky-recipe. It does not save the recipe
+	 */
 	public Recipe importRecipe(String url) {
 
 		LOG.info("start import of recipe from url " + url);
@@ -41,11 +44,11 @@ public class ChefkochImportService {
 
 			Document doc = Jsoup.connect(url).get();
 
-			Recipe recipe = createTemporaryRecipe(doc, url);
+			Recipe recipe = createTemporaryRecipeWithOneRecipePart(doc, url);
 
-			Set<IngredientToRecipe> itrSet = createTemporaryIngredients(doc);
+			Set<IngredientToRecipePart> itrSet = createTemporaryIngredients(doc);
 
-			recipe.setIngredients(itrSet);
+			recipe.getRecipeParts().iterator().next().setIngredients(itrSet);
 
 			LOG.info("finished import of recipe from url " + url);
 			
@@ -60,7 +63,7 @@ public class ChefkochImportService {
 
 	}
 
-	private Set<IngredientToRecipe> createTemporaryIngredients(Document doc) {
+	private Set<IngredientToRecipePart> createTemporaryIngredients(Document doc) {
 		Elements ingredientTable = doc.getElementsByAttributeValue("class", "ingredients table-header");
 
 		if (ingredientTable.isEmpty()) {
@@ -76,11 +79,11 @@ public class ChefkochImportService {
 
 		Elements rowList = table.getElementsByTag("tr");
 
-		Set<IngredientToRecipe> itrSet = new LinkedHashSet<>();
+		Set<IngredientToRecipePart> itrSet = new LinkedHashSet<>();
 
 		rowList.forEach(row -> {
 
-			IngredientToRecipe itr = new IngredientToRecipe();
+			IngredientToRecipePart itr = new IngredientToRecipePart();
 
 			Element amount = row.getElementsByTag("td").first();
 			String amountText = amount.text();
@@ -118,7 +121,7 @@ public class ChefkochImportService {
 
 			// TODO Zutats-Bezeichnung noch einbasteln
 			Element name = row.getElementsByTag("td").last();
-			String ingredientName = null;
+			String ingredientName;
 			if (name.text().isEmpty()) {
 				Element linkContent = row.getElementsByTag("td").last().getAllElements().first();
 
@@ -140,7 +143,7 @@ public class ChefkochImportService {
 		return itrSet;
 	}
 
-	private Recipe createTemporaryRecipe(Document doc, String url) {
+	private Recipe createTemporaryRecipeWithOneRecipePart(Document doc, String url) {
 
 		Elements recipeTitles = doc.getElementsByTag("h1");
 
@@ -203,6 +206,9 @@ public class ChefkochImportService {
 		recipe.setSource(url);
 		recipe.setDescription(builder.toString());
 		recipe.setPersons(Integer.parseInt(portions.first().attr("value")));
+
+		RecipePart part = new RecipePart();
+		recipe.getRecipeParts().add(part);
 
 		return recipe;
 	}

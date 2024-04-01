@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.cooky.data.IngredientToRecipe;
+import de.cooky.data.IngredientToRecipePart;
 import de.cooky.data.ShoppingItem;
 import de.cooky.repository.ShoppingItemRepository;
 
@@ -19,14 +19,14 @@ public class ShoppingItemService {
 	@Autowired
 	private ShoppingItemRepository shoppingItemRepo;
 
-	public void enhanceShoppingList(List<IngredientToRecipe> ingredients) {
+	public void enhanceShoppingList(List<IngredientToRecipePart> ingredients) {
 
-		List<IngredientToRecipe> tmp = new ArrayList<IngredientToRecipe>(ingredients);
+		List<IngredientToRecipePart> tmp = new ArrayList<IngredientToRecipePart>(ingredients);
 
-		Map<String, List<IngredientToRecipe>> ingredientNames = new HashMap<>();
+		Map<String, List<IngredientToRecipePart>> ingredientNames = new HashMap<>();
 
-		for (IngredientToRecipe itr : ingredients) {
-			List<IngredientToRecipe> list = ingredientNames.get(itr.getIngredient().getName());
+		for (IngredientToRecipePart itr : ingredients) {
+			List<IngredientToRecipePart> list = ingredientNames.get(itr.getIngredient().getName());
 
 			if (list == null) {
 				list = new ArrayList<>();
@@ -41,13 +41,13 @@ public class ShoppingItemService {
 
 		for (ShoppingItem item : items) {
 
-			List<IngredientToRecipe> list = ingredientNames.get(item.getName());
+			List<IngredientToRecipePart> list = ingredientNames.get(item.getName());
 
 			if (list == null) {
 				continue;
 			}
 
-			for (IngredientToRecipe itr : list) {
+			for (IngredientToRecipePart itr : list) {
 
 				if (!StringUtils.equals(itr.getUnit(), item.getUnit())) {
 					continue;
@@ -59,7 +59,7 @@ public class ShoppingItemService {
 		}
 
 		List<ShoppingItem> newItems = new ArrayList<>();
-		for (IngredientToRecipe newIngredient : tmp) {
+		for (IngredientToRecipePart newIngredient : tmp) {
 
 			ShoppingItem item = new ShoppingItem();
 			item.setName(newIngredient.getIngredient().getName());

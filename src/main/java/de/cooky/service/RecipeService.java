@@ -1,8 +1,9 @@
 package de.cooky.service;
 
 import de.cooky.data.Ingredient;
-import de.cooky.data.IngredientToRecipe;
+import de.cooky.data.IngredientToRecipePart;
 import de.cooky.data.Recipe;
+import de.cooky.data.RecipePart;
 import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -38,22 +39,24 @@ public class RecipeService {
 
 	private void updateIngredients(Recipe recipe) {
 
-		//also recreate the order so that it fixes gaps or errors in the list
-		int counter = 0;
-		for (IngredientToRecipe ingr : recipe.getIngredients()) {
-			Ingredient ingredient = ingr.getIngredient();
+		//also recreate the order so that it fixes gaps or other issues in the list
+		for(RecipePart part : recipe.getRecipeParts()){
+			int counter = 0;
+			for (IngredientToRecipePart ingr : part.getIngredients()) {
+				Ingredient ingredient = ingr.getIngredient();
 
-			if (ingredient == null) {
-				throw new CookyErrorMsg("No ingredient found on ingredient_usage-object");
+				if (ingredient == null) {
+					throw new CookyErrorMsg("No ingredient found on ingredient_usage-object");
+				}
+
+				if (StringUtils.isEmpty(ingredient.getName())) {
+					throw new CookyErrorMsg("an ingredient has no name");
+				}
+
+				Ingredient ingredientFromDB = ingredientService.getOrCreateIngredient(ingredient.getName());
+				ingr.setIngredient(ingredientFromDB);
+				ingr.setOrder(counter++);
 			}
-
-			if (StringUtils.isEmpty(ingredient.getName())) {
-				throw new CookyErrorMsg("an ingredient has no name");
-			}
-
-			Ingredient ingredientFromDB = ingredientService.getOrCreateIngredient(ingredient.getName());
-			ingr.setIngredient(ingredientFromDB);
-			ingr.setOrder(counter++);
 		}
 	}
 
@@ -86,14 +89,16 @@ public class RecipeService {
 
 		List<Recipe> selected = recipeRepo.findByIdIn(recipeIds);
 
-		List<IngredientToRecipe> ingredients = new ArrayList<>();
+		List<IngredientToRecipePart> ingredients = new ArrayList<>();
 
 		selected.forEach(recipe -> {
 			Boolean selectionValue = newSelectionSettings.get(recipe.getId());
 			recipe.setSelected(selectionValue);
 
 			if (selectionValue) {
-				ingredients.addAll(recipe.getIngredients());
+				for (RecipePart recipePart : recipe.getRecipeParts()) {
+					ingredients.addAll(recipePart.getIngredients());
+				}
 			}
 		});
 
@@ -101,7 +106,7 @@ public class RecipeService {
 	}
 
 	public Recipe insertFromString(String ingredientsAsString, String recipeName){
-		Set<IngredientToRecipe> ingredients = ingredientService.createIngredientsFromString(ingredientsAsString);
+		Set<IngredientToRecipePart> ingredients = ingredientService.createIngredientsFromString(ingredientsAsString);
 
 		Recipe recipe = recipeRepo.findByName(recipeName);
 
@@ -109,7 +114,8 @@ public class RecipeService {
 			//TODO throw recipe not found error
 		}
 
-		recipe.getIngredients().addAll(ingredients);
+		//TODO a bit optimistic, ain' it?
+		recipe.getRecipeParts().iterator().next().getIngredients().addAll(ingredients);
 
 		return recipe;
 	}

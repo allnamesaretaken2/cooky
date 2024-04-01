@@ -1,10 +1,9 @@
 package de.cooky.data;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 public class Recipe {
@@ -25,14 +24,14 @@ public class Recipe {
 	/** a cookbook-page or a link */
 	private String source;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("order ASC")
-	@JoinColumn(name = "id_recipe")
-	private Set<IngredientToRecipe> ingredients = new HashSet<>();
-
 	private boolean selected;
 
 	private Integer durationInMinutes;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy("id ASC")
+	@JoinColumn(name = "id_recipe")
+	private Set<RecipePart> recipeParts = new LinkedHashSet<>();
 	
 	public Recipe() {
 
@@ -52,14 +51,6 @@ public class Recipe {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Set<IngredientToRecipe> getIngredients() {
-		return ingredients;
-	}
-
-	public void setIngredients(Set<IngredientToRecipe> ingredients) {
-		this.ingredients = ingredients;
 	}
 
 	public void setDescription(String description) {
@@ -100,5 +91,13 @@ public class Recipe {
 
 	public Integer getDurationInMinutes() {
 		return durationInMinutes;
+	}
+
+	public void setRecipeParts(Set<RecipePart> recipeParts) {
+		this.recipeParts = recipeParts;
+	}
+
+	public Set<RecipePart> getRecipeParts() {
+		return recipeParts;
 	}
 }

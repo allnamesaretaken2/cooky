@@ -1,7 +1,7 @@
 package de.cooky.service;
 
 import de.cooky.data.Ingredient;
-import de.cooky.data.IngredientToRecipe;
+import de.cooky.data.IngredientToRecipePart;
 import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.IngredientRepository;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -53,11 +53,11 @@ public class IngredientService {
 	/**
 	 * Creates a new set of ingredientToRecipe-Objects containing the new ingredients.
 	 */
-    public Set<IngredientToRecipe> createIngredientsFromString(String ingredientsAsStringBlobb) {
+    public Set<IngredientToRecipePart> createIngredientsFromString(String ingredientsAsStringBlobb) {
 
 		String[] ingredientsAsString = ingredientsAsStringBlobb.split(";");
 
-		Set<IngredientToRecipe> result = new LinkedHashSet<>();
+		Set<IngredientToRecipePart> result = new LinkedHashSet<>();
 
 		int counter = 0;
 		for (String ingAsString : ingredientsAsString) {
@@ -100,7 +100,7 @@ public class IngredientService {
 
 			Ingredient ing = getOrCreateIngredient(ingredientName);
 
-			IngredientToRecipe ingToRecipe = new IngredientToRecipe();
+			IngredientToRecipePart ingToRecipe = new IngredientToRecipePart();
 			ingToRecipe.setIngredient(ing);
 			ingToRecipe.setAmount(amount);
 			ingToRecipe.setUnit(unit);
