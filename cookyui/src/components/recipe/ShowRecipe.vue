@@ -9,40 +9,38 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12 col-sm-3 col-xl-2">
+            <div class="col-6 col-sm-3 col-xl-2">
                 <b>Personen:</b>
             </div>
-            <div class="col-12 col-sm-7 col-md-2">
+            <div class="col-6 col-sm-7 col-md-2">
                 <span>{{ recipe.persons }}</span>
             </div>
         </div>
-        <div class="row" v-if="recipe.durationInMinutes">
-            <div class="col-12 col-sm-3 col-xl-2">
-                Dauer:
+        <div class="row">
+            <div class="col-6 col-sm-3 col-xl-2">
+                <b>Dauer:</b>
             </div>
-            <div class="col-12 col-sm-7 col-md-2">
+            <div class="col-6 col-sm-7 col-md-2">
                 <span>{{ recipe.durationInMinutes }} Minuten</span>
             </div>
         </div>
-        <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2" >
-                Zutaten:
-            </b>
-            <div class="col">
-                <ul class="no-bullets-for-list">
-                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key" >
-                        <span v-if="ingredient.amount" style="margin-right: 5px;">{{ ingredient.amount }}</span>
-                        <span v-if="ingredient.unit" style="margin-right: 5px;">{{ ingredient.unit }}</span>
-                        <span>{{ ingredient.ingredient.name }}</span>
-                    </li>
-                </ul>
+        <div v-for="(recipePart, key) in recipe.recipeParts" :key="key">
+            <div class="row mt-3"><div class="col"><b>{{recipePart.name}}</b></div></div>
+            <div class="row">
+                <div class="col-5 col-sm-3 col-xl-4 offset-1">
+                    <ul class="no-bullets-for-list">
+                        <li v-for="(ingredient, key) in recipePart.ingredients" :key="key" >
+                            <span v-if="ingredient.amount" style="margin-right: 5px;">{{ ingredient.amount }}</span>
+                            <span v-if="ingredient.unit" style="margin-right: 5px;">{{ ingredient.unit }}</span>
+                            <span>{{ ingredient.ingredient.name }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 col-sm-8 col-xl-7">{{recipePart.description}}</div>
             </div>
         </div>
         <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2">
-                Zubereitung:
-            </b>
-            <div class="col-12 col-sm-10 col-xl-8">
+            <div class="col mt-3">
                 <span style="white-space: pre-line;">{{ recipe.description }}</span>
             </div>
         </div>
