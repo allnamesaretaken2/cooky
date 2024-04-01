@@ -2,6 +2,7 @@ package de.cooky.service;
 
 import de.cooky.data.Ingredient;
 import de.cooky.data.IngredientToRecipe;
+import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.IngredientRepository;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +79,7 @@ public class IngredientService {
 				// the name and the number are given (e.g. 3 eggs)
 				String amountAsString = ingredientParts[0];
 				if(!NumberUtils.isCreatable(amountAsString)){
-					//TODO throw exception
+					throw new CookyErrorMsg("Menge der Zutaten müssen 'ne 'Zahl sein.");
 				}
 
 				ingredientName = ingredientParts[1];
@@ -89,7 +90,7 @@ public class IngredientService {
 				// the name, the unit and the amount are given (e.g. 1 liter milk)
 				String amountAsString = ingredientParts[0];
 				if(!NumberUtils.isCreatable(amountAsString)){
-					//throw exception
+					throw new CookyErrorMsg("Menge der Zutaten müssen 'ne 'Zahl sein.");
 				}
 
 				ingredientName = ingredientParts[2];

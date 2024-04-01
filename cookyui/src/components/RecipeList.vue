@@ -12,12 +12,17 @@
 
             <table class="table table-hover">
                 <thead style="background-color:#AFBC6C">
-                    <th class="py-2">Name</th><th />
+                    <th class="py-2">Name</th>
+                    <th class="py-2">Dauer in Min.</th>
+                    <th />
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in recipes" :key="key">
                         <td @click="openRecipe(recipe.id)">
                             <h5>{{ recipe.name }}</h5>
+                        </td>
+                        <td @click="openRecipe(recipe.id)">
+                            <h5>{{ recipe.durationInMinutes }}</h5>
                         </td>
                         <td class="text-right">
                             <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)" />
@@ -100,19 +105,15 @@ export default {
 
             this.showLoadingSpinner = true
 
-            try {
-                let url = '/rest/recipes/'
+            let url = '/rest/recipes/'
 
-                if (this.searchText) {
-                    url += '?name=' + this.searchText
-                }
-
-                const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-                const json = await response.json()
-                this.recipes = json
-            } catch (error) {
-                console.log('Error: ', error)
+            if (this.searchText) {
+                url += '?name=' + this.searchText
             }
+
+            const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const json = await response.json()
+            this.recipes = json
 
             this.showLoadingSpinner = false
         },

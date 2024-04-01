@@ -25,6 +25,16 @@
             </div>
         </div>
         <div class="row">
+            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+                Dauer:
+            </b>
+            <div class="col-12 col-sm-7 col-md-2">
+                <input v-if="editMode" v-model="recipe.durationInMinutes" class="form-control">
+                <span v-else>{{ recipe.durationInMinutes }}</span>
+            </div>
+            <span class="col-12 col-sm-3 col-xl-2 col-form-label">Minuten</span>
+        </div>
+        <div class="row">
             <b class="col-12 col-sm-3 col-xl-2" >
                 Zutaten:
             </b>
@@ -105,13 +115,10 @@ export default {
         async getRecipe () {
             this.editMode = false
             const recipeID = this.$route.params.id
-            try {
-                const response = await fetch('/rest/recipes/' + recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-                const json = await response.json()
-                this.recipe = json
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+
+            const response = await fetch('/rest/recipes/' + recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const json = await response.json()
+            this.recipe = json
         },
 
         async getIngredients () {
@@ -121,11 +128,8 @@ export default {
         },
 
         async saveRecipe () {
-            try {
-                await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
+
             this.editMode = false
         },
 

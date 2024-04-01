@@ -11,7 +11,15 @@
                 </div>
             </div> <!-- header -->
             <router-view />
-
+            <div class="cookyAlertContainer">
+                <div v-for="(notification,key) in cookyNotifications" :key="key"
+                     class="alert alert-danger alert-dismissible">
+                    {{ notification }}
+                    <button type="button" class="close" @click="removeNotification(notification, key)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -20,6 +28,17 @@
 
 export default {
     name: 'App',
+    data () {
+        return {
+            cookyNotifications: [],
+        }
+    },
+
+    methods: {
+        removeNotification (notification, key) {
+            this.cookyNotifications.pop(notification)
+        },
+    },
 }
 </script>
 
@@ -28,4 +47,9 @@ export default {
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
 body {background-color:#FBFAF0}
 
+.cookyAlertContainer {
+    position: fixed;
+    margin : auto;
+    top: 0;
+}
 </style>

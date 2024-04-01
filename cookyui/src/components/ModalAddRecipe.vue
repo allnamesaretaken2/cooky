@@ -68,27 +68,28 @@ export default {
         },
 
         async submitAndClose () {
-            try {
-                await fetch('/rest/recipes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.newRecipe) })
-                const recipeName = this.newRecipe.name
-                await fetch('/rest/ingredients/insertFromString/' + recipeName,
-                    { method: 'POST', headers: { 'Content-Type': 'application/text' }, body: this.ingredientsAsString.replaceAll('\n', ';') })
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            await fetch('/rest/recipes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.newRecipe) })
+            const recipeName = this.newRecipe.name
+
+            await fetch('/rest/ingredients/insertFromString/' + recipeName,
+                { method: 'POST', headers: { 'Content-Type': 'application/text' }, body: this.ingredientsAsString.replaceAll('\n', ';') })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw Error(response.statusText)
+                    }
+                    return response
+                },
+                )
+
             this.callback()
             this.$refs.baseModal.close()
         },
 
         async chefkoch () {
-            try {
-                const response = await fetch('/rest/recipes/importFromChefkoch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.chefkochImport) })
-                const json = await response.json()
-                this.newRecipe = json
-                this.chefkochImport.url = null
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            const response = await fetch('/rest/recipes/importFromChefkoch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.chefkochImport) })
+            const json = await response.json()
+            this.newRecipe = json
+            this.chefkochImport.url = null
         },
     },
 }

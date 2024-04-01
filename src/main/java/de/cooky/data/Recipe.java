@@ -31,6 +31,8 @@ public class Recipe {
 	private Set<IngredientToRecipe> ingredients = new HashSet<>();
 
 	private boolean selected;
+
+	private Integer durationInMinutes;
 	
 	public Recipe() {
 
@@ -90,5 +92,13 @@ public class Recipe {
 	
 	public void setSelected(boolean selected) {
 		this.selected = selected;
+	}
+
+	public void setDurationInMinutes(Integer durationInMinutes) {
+		this.durationInMinutes = durationInMinutes;
+	}
+
+	public Integer getDurationInMinutes() {
+		return durationInMinutes;
 	}
 }
