@@ -17,43 +17,49 @@
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
                 Personen:
             </b>
-            <div class="col-12 col-sm-7 col-md-2">
-                <input v-model="recipe.persons" class="form-control">
-            </div>
+            <input v-model="recipe.persons" class="form-control col-12 col-sm-3">
         </div>
         <div class="row">
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
-                Dauer:
+                Dauer [min]:
             </b>
-            <div class="col-12 col-sm-7 col-md-2">
-                <input v-model="recipe.durationInMinutes" class="form-control">
-            </div>
-            <span class="col-12 col-sm-3 col-xl-2 col-form-label">Minuten</span>
+            <input v-model="recipe.durationInMinutes" class="form-control col-12 col-sm-3">
         </div>
-        <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2" >
-                Zutaten:
-            </b>
-            <div class="col">
-                <table class="table table-hover">
-                    <thead style="background-color:#AFBC6C">
-                        <th class="py-2">Name</th><th />
-                    </thead>
-                    <tbody ref="ingredientList">
-                        <tr v-for="(ingredient,key) in recipe.ingredients" :key="key" draggable="true"
-                            @dragstart="startDrag(ingredient)" @drop="finishDrag" @dragenter="changeOrder(ingredient)">
-                            <b>{{ ingredient.order }}</b>
-                            <input v-model="ingredient.amount" type="number">
-                            <input v-model="ingredient.unit" type="text">
-                            <Combobox v-model="ingredient.ingredient.name" style="display: inline-block" :comboValues="existingIngredients"/>
-
-                            <td class="text-right"><button type="button" class="btn btn-secondary fa fa-trash" @click="deleteIngredient(ingredient, key)" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="text-right">
-                    <button class="btn btn-secondary fa fa-trash" @click="addIngredient()">Zutat hinzufügen</button>
+        <div v-for="(recipePart, recipePartIndex) in recipe.recipeParts" :key="'recipePart'+recipePart.id">
+            <div class="row mt-4">
+                <div class="col-12 col-sm-3 col-xl-2 col-form-label">
+                    <b>Abschnitt:</b>
                 </div>
+                <input v-model="recipePart.name" class="form-control col-12 col-sm-7">
+                <button class="btn btn-secondary col-6 col-sm-1" @click="addPart()">Abschnitt hinzufügen</button>
+                <button class="btn btn-secondary col-6 col-sm-1" @click="deletePart(recipePartIndex)">Abschnitt löschen</button>
+            </div>
+            <div class="row">
+                <div class="col-8">
+                    <table class="table table-hover">
+                        <thead style="background-color:#AFBC6C">
+                            <th class="py-2">Menge</th><th>Zutat</th><th />
+                        </thead>
+                        <tbody ref="ingredientList">
+                            <tr v-for="(ingredient,ingredientIndex) in recipePart.ingredients" :key="'ingredient'+ingredientIndex" draggable="true"
+                                @dragstart="startDrag(ingredient)" @drop="finishDrag" @dragenter="changeOrder(ingredient)">
+                                <td>
+                                    <b>{{ ingredient.order }}</b>
+                                    <input v-model="ingredient.amount" type="number" class="form-control">
+                                    <input v-model="ingredient.unit" type="text" class="form-control">
+                                </td>
+                                <td>
+                                    <Combobox v-model="ingredient.ingredient.name" style="display: inline-block" :comboValues="existingIngredients"/>
+                                </td>
+                                <td class="text-right"><button type="button" class="btn btn-secondary fa fa-trash" @click="deleteIngredient(recipePart.id, ingredientIndex)" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-right">
+                        <button class="btn btn-secondary" @click="addIngredient(recipePart.id)">Zutat hinzufügen</button>
+                    </div>
+                </div>
+                <div class="col-4"><textarea v-model="recipePart.description" rows="7" class="form-control" /></div>
             </div>
         </div>
         <div class="row">
@@ -113,16 +119,25 @@ export default {
             await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
             this.$emit('toggleEditMode')
         },
-
-        deleteIngredient (ingredient, key) {
-            this.recipe.ingredients.splice(key, 1)
+        addPart () {
+            this.recipe.recipeParts.push({
+                name: '',
+                description: '',
+                ingredients: [],
+            })
+        },
+        deletePart (recipePartIndex) {
+            this.recipe.recipeParts.splice(recipePartIndex, 1)
+        },
+        deleteIngredient (recipePartID, key) {
+            this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.splice(key, 1)
         },
 
-        addIngredient () {
-            this.recipe.ingredients.push({
+        addIngredient (recipePartID) {
+            this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.push({
                 amount: 1,
                 unit: '',
-                order: this.recipe.ingredients.length,
+                order: this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.length,
                 ingredient: {
                     name: '',
                 },
@@ -149,11 +164,3 @@ export default {
     },
 }
 </script>
-
-<style>
-.no-bullets-for-list {
-  list-style-type: none; /* Remove bullets */
-  padding: 0; /* Remove padding */
-  margin: 0; /* Remove margins */
-}
-</style>
