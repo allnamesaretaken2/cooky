@@ -3,34 +3,30 @@
         <div class="row mt-2">
             <div class="col-10 col-xl-8">
                 <h3>
-                    <input v-if="editMode" v-model="recipe.name" class="form-control">
-                    <span v-else>{{ recipe.name }}</span>
+                    <input v-model="recipe.name" class="form-control">
                 </h3>
             </div>
             <div class="col-2 ml-auto text-right">
-                <h4 v-if="editMode">
-                    <button class="btn btn-secondary fa fa-undo" title="Abbrechen" @click="getRecipe()" />
+                <h4>
+                    <button class="btn btn-secondary fa fa-undo" title="Abbrechen" @click="$emit('toggleEditMode')" />
                     <button class="btn btn-secondary fa fa-save" title="Rezepte speichern" @click="saveRecipe()" />
                 </h4>
-                <h4 v-else><i class="fa fa-edit" @click="editMode=true" /></h4>
             </div>
         </div>
         <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+            <b class="col-12 col-sm-3 col-xl-2 col-form-label">
                 Personen:
             </b>
             <div class="col-12 col-sm-7 col-md-2">
-                <input v-if="editMode" v-model="recipe.persons" class="form-control">
-                <span v-else>{{ recipe.persons }}</span>
+                <input v-model="recipe.persons" class="form-control">
             </div>
         </div>
         <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+            <b class="col-12 col-sm-3 col-xl-2 col-form-label">
                 Dauer:
             </b>
             <div class="col-12 col-sm-7 col-md-2">
-                <input v-if="editMode" v-model="recipe.durationInMinutes" class="form-control">
-                <span v-else>{{ recipe.durationInMinutes }}</span>
+                <input v-model="recipe.durationInMinutes" class="form-control">
             </div>
             <span class="col-12 col-sm-3 col-xl-2 col-form-label">Minuten</span>
         </div>
@@ -38,7 +34,7 @@
             <b class="col-12 col-sm-3 col-xl-2" >
                 Zutaten:
             </b>
-            <div v-if="editMode" class="col">
+            <div class="col">
                 <table class="table table-hover">
                     <thead style="background-color:#AFBC6C">
                         <th class="py-2">Name</th><th />
@@ -59,32 +55,21 @@
                     <button class="btn btn-secondary fa fa-trash" @click="addIngredient()">Zutat hinzufügen</button>
                 </div>
             </div>
-            <div v-else class="col">
-                <ul class="no-bullets-for-list">
-                    <li v-for="(ingredient, key) in recipe.ingredients" :key="key" >
-                        <span v-if="ingredient.amount" style="margin-right: 5px;">{{ ingredient.amount }}</span>
-                        <span v-if="ingredient.unit" style="margin-right: 5px;">{{ ingredient.unit }}</span>
-                        <span>{{ ingredient.ingredient.name }}</span>
-                    </li>
-                </ul>
-            </div>
         </div>
         <div class="row">
-            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+            <b class="col-12 col-sm-3 col-xl-2 col-form-label">
                 Zubereitung:
             </b>
             <div class="col-12 col-sm-10 col-xl-8">
-                <textarea v-if="editMode" v-model="recipe.description" rows="7" class="form-control" />
-                <span v-else style="white-space: pre-line;">{{ recipe.description }}</span>
+                <textarea v-model="recipe.description" rows="7" class="form-control" />
             </div>
         </div>
         <div class="row mt-3">
-            <b class="col-12 col-sm-3 col-xl-2" :class="{'col-form-label': editMode}">
+            <b class="col-12 col-sm-3 col-xl-2 col-form-label">
                 Quelle:
             </b>
             <div class="col-12 col-sm-7 col-xl-6">
-                <input v-if="editMode" v-model="recipe.source" class="form-control">
-                <span v-else>{{ recipe.source }}</span>
+                <input v-model="recipe.source" class="form-control">
             </div>
         </div>
     </div>
@@ -92,31 +77,28 @@
 
 <script>
 
-import Combobox from './Combo.vue'
+import Combobox from '../Combo.vue'
 
 export default {
-    name: 'Recipe',
+    name: 'EditRecipe',
     components: {
         Combobox,
     },
     data: function () {
         return {
             recipe: {},
-            editMode: false,
             existingIngredients: [],
             draggedIngredient: null,
         }
     },
-    mounted: function () {
+    props: ['recipeID'],
+    mounted () {
         this.getRecipe()
         this.getIngredients()
     },
     methods: {
         async getRecipe () {
-            this.editMode = false
-            const recipeID = this.$route.params.id
-
-            const response = await fetch('/rest/recipes/' + recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const json = await response.json()
             this.recipe = json
         },
@@ -129,8 +111,7 @@ export default {
 
         async saveRecipe () {
             await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
-
-            this.editMode = false
+            this.$emit('toggleEditMode')
         },
 
         deleteIngredient (ingredient, key) {
