@@ -55,8 +55,9 @@
                             </tr>
                         </tbody>
                     </table>
-                    <div class="text-right">
-                        <button class="btn btn-secondary" @click="addIngredient(recipePart.id)">Zutat hinzufügen</button>
+                    <div class="row">
+                        <textarea class="form-control col-8" :id="'recipePartTextfield' + recipePartIndex" />
+                        <button class="btn btn-secondary col-4" @click="addIngredient(recipePart, 'recipePartTextfield' + recipePartIndex)">Zutat hinzufügen</button>
                     </div>
                 </div>
                 <div class="col-4"><textarea v-model="recipePart.description" rows="7" class="form-control" /></div>
@@ -133,15 +134,12 @@ export default {
             this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.splice(key, 1)
         },
 
-        addIngredient (recipePartID) {
-            this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.push({
-                amount: 1,
-                unit: '',
-                order: this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.length,
-                ingredient: {
-                    name: '',
-                },
-            })
+        addIngredient (recipePart, inputFieldId) {
+            const valuesAsText = document.getElementById(inputFieldId).value
+
+            const ingredients = this.createIngredientsAndAddValuesIfGiven(recipePart, valuesAsText)
+
+            recipePart.ingredients.push(...ingredients)
         },
         startDrag (ingredient) {
             this.draggedIngredient = ingredient
@@ -160,6 +158,42 @@ export default {
             var order = this.draggedIngredient.order
             this.draggedIngredient.order = ingredient.order
             ingredient.order = order
+        },
+        createIngredientsAndAddValuesIfGiven (recipePart, valuesAsText) {
+            const textArray = valuesAsText.split('\n')
+            const ingredientArray = []
+            let counter = recipePart.ingredients.length
+
+            textArray.forEach(textForIngredient => {
+                const ingredient = {
+                    amount: 1,
+                    unit: '',
+                    order: counter++,
+                    ingredient: {
+                        name: '',
+                    },
+                }
+                this.squeezeValuesIntoIngredient(ingredient, textForIngredient)
+                ingredientArray.push(ingredient)
+            })
+
+            return ingredientArray
+        },
+        squeezeValuesIntoIngredient (ingredient, valuesAsText) {
+            if (valuesAsText.length !== 0) {
+                const ingredientParts = valuesAsText.split(' ')
+
+                if (ingredientParts.length === 1) {
+                    ingredient.ingredient.name = ingredientParts[0]
+                } else if (ingredientParts.length === 2) {
+                    ingredient.amount = parseInt(ingredientParts[0])
+                    ingredient.ingredient.name = ingredientParts[1]
+                } else if (ingredientParts.length === 3) {
+                    ingredient.amount = parseInt(ingredientParts[0])
+                    ingredient.unit = ingredientParts[1]
+                    ingredient.ingredient.name = ingredientParts[2]
+                }
+            }
         },
     },
 }
