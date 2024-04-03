@@ -42,9 +42,8 @@
                         </thead>
                         <tbody ref="ingredientList">
                             <tr v-for="(ingredient,ingredientIndex) in recipePart.ingredients" :key="'ingredient'+ingredientIndex" draggable="true"
-                                @dragstart="startDrag(ingredient)" @drop="finishDrag" @dragenter="changeOrder(ingredient)">
+                                @dragstart="startDrag(recipePart, ingredient)" @drop="finishDrag" @dragenter="changeOrder(recipePart, ingredient)">
                                 <td>
-                                    <b>{{ ingredient.order }}</b>
                                     <input v-model="ingredient.amount" type="number" class="form-control">
                                     <input v-model="ingredient.unit" type="text" class="form-control">
                                 </td>
@@ -141,23 +140,33 @@ export default {
 
             recipePart.ingredients.push(...ingredients)
         },
-        startDrag (ingredient) {
+        startDrag (recipePart, ingredient) {
             this.draggedIngredient = ingredient
+            this.draggedIngredientRecipePart = recipePart
         },
         finishDrag () {
             this.draggedIngredient = null
+            this.draggedIngredientRecipePart = null
         },
-        changeOrder (ingredient) {
-            const ings = this.recipe.ingredients
+        changeOrder (recipePart, ingredient) {
+            if (recipePart === this.draggedIngredientRecipePart) {
+                // dragging within a recipe part
+                const newIndex = recipePart.ingredients.indexOf(ingredient)
+                const oldIndex = recipePart.ingredients.indexOf(this.draggedIngredient)
 
-            const newIndex = ings.indexOf(ingredient)
-            const oldIndex = ings.indexOf(this.draggedIngredient)
-            ings[newIndex] = this.draggedIngredient
-            ings[oldIndex] = ingredient
-
-            var order = this.draggedIngredient.order
-            this.draggedIngredient.order = ingredient.order
-            ingredient.order = order
+                recipePart.ingredients[newIndex] = this.draggedIngredient
+                recipePart.ingredients[oldIndex] = ingredient
+            } else {
+                // dragging across recipe parts
+                const newIndex = recipePart.ingredients.indexOf(ingredient)
+                const oldIndex = this.draggedIngredientRecipePart.ingredients.indexOf(this.draggedIngredient)
+                // add ingredient to new recipe part
+                recipePart.ingredients.splice(newIndex, 0, ingredient)
+                // remove ingredient from old recipe part
+                this.draggedIngredientRecipePart.ingredients.splice(oldIndex, 1)
+                // draggedIngredient recipe part has now changed
+                this.draggedIngredientRecipePart = recipePart
+            }
         },
         createIngredientsAndAddValuesIfGiven (recipePart, valuesAsText) {
             const textArray = valuesAsText.split('\n')
