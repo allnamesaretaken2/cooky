@@ -1,12 +1,14 @@
 <template>
     <div class="dropdown">
-        <input v-model="newValue" @input="filterOptions" placeholder="Type to filter">
-        <button type="button" class="btn btn-secondary fa fa-toggle-down" @click="showDropdownEvent" />
-        <ul v-if="showDropdown" class="dropdown-style">
-            <li v-for="(option, index) in filteredOptions" :key="index" @click="selectOption(option)" @mouseover="markElementHovered" @mouseleave="markElementNotHovered">
+        <div class="input-group">
+            <input v-model="newValue" @input="filterOptions" placeholder="Type to filter" class="form-control">
+            <button type="button" class="btn btn-secondary fa fa-toggle-down input-group-append" @click="showDropdownEvent" />
+        </div>
+        <div v-if="showDropdown" class="dropdown-style">
+            <a v-for="(option, index) in filteredOptions" :key="index" @click="selectOption(option)" class="dropdown-item">
                 {{ option }}
-            </li>
-        </ul>
+            </a>
+        </div>
     </div>
 </template>
 
@@ -49,12 +51,6 @@ export default {
             this.filteredOptions = this.comboValues
             this.showDropdown = !this.showDropdown
         },
-        markElementHovered (event) {
-            event.target.classList.add('dropdown-listentry-hovered')
-        },
-        markElementNotHovered (event) {
-            event.target.classList.remove('dropdown-listentry-hovered')
-        },
     },
 }
 </script>
@@ -66,10 +62,7 @@ export default {
     z-index : 1;
     position: absolute;
     background-color: white;
-    border: 1px solid black;
-}
-
-.dropdown-listentry-hovered{
-    background-color: aquamarine;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
 }
 </style>
