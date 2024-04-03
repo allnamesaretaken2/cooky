@@ -27,7 +27,7 @@
         <div v-for="(recipePart, key) in recipe.recipeParts" :key="key">
             <div class="row mt-3"><div class="col"><b>{{recipePart.name}}</b></div></div>
             <div class="row">
-                <div class="col-5 col-sm-3 col-xl-4 offset-1">
+                <div class="col-5 col-sm-3 col-xl-4 offset-sm-1">
                     <ul class="no-bullets-for-list">
                         <li v-for="(ingredient, key) in recipePart.ingredients" :key="key" >
                             <span v-if="ingredient.amount" style="margin-right: 5px;">{{ ingredient.amount }}</span>

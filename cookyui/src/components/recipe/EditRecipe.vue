@@ -1,81 +1,86 @@
 <template>
     <div>
-        <div class="row mt-2">
-            <div class="col-10 col-xl-8">
-                <h3>
-                    <input v-model="recipe.name" class="form-control">
-                </h3>
+        <div class="form-row mt-2">
+            <div class="col-10">
+                <input v-model="recipe.name" class="form-control">
             </div>
-            <div class="col-2 ml-auto text-right">
-                <h4>
-                    <button class="btn btn-secondary fa fa-undo" title="Abbrechen" @click="$emit('toggleEditMode')" />
-                    <button class="btn btn-secondary fa fa-save" title="Rezepte speichern" @click="saveRecipe()" />
-                </h4>
+            <div class="col-2 col-form-group d-flex text-right">
+                <button class="btn btn-secondary fa fa-undo form-control" title="Abbrechen" @click="$emit('toggleEditMode')" />
+                <button class="btn btn-secondary fa fa-save form-control" title="Rezepte speichern" @click="saveRecipe()" />
             </div>
         </div>
-        <div class="row">
+        <div class="form-row">
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
-                Personen:
+                Personen
             </b>
-            <input v-model="recipe.persons" class="form-control col-12 col-sm-3">
-        </div>
-        <div class="row">
+            <div class="col-12 col-sm-3">
+                <input v-model="recipe.persons" class="form-control">
+            </div>
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
-                Dauer [min]:
+                Dauer [min]
             </b>
-            <input v-model="recipe.durationInMinutes" class="form-control col-12 col-sm-3">
+            <div class=" col-12 col-sm-3">
+                <input v-model="recipe.durationInMinutes" class="form-control">
+            </div>
         </div>
         <div v-for="(recipePart, recipePartIndex) in recipe.recipeParts" :key="'recipePart'+recipePart.id">
-            <div class="row mt-4">
+            <div class="form-row mt-4" style="background-color:#AFBC6C" >
                 <div class="col-12 col-sm-3 col-xl-2 col-form-label">
-                    <b>Abschnitt:</b>
+                    <b>Schritt</b>
                 </div>
-                <input v-model="recipePart.name" class="form-control col-12 col-sm-7">
-                <button class="btn btn-secondary col-6 col-sm-1" @click="addPart()">Abschnitt hinzufügen</button>
-                <button class="btn btn-secondary col-6 col-sm-1" @click="deletePart(recipePartIndex)">Abschnitt löschen</button>
+                <div class="col-12 col-sm-7 col-xl-8">
+                    <input v-model="recipePart.name" class="form-control my-1">
+                </div>
+                <div class="col-12 col-sm-2 col-form-group d-flex text-right">
+                    <button class="btn btn-secondary form-control fa fa-plus my-1" @click="addPart(recipePartIndex)"></button>
+                    <button class="btn btn-secondary form-control fa fa-trash my-1" @click="deletePart(recipePartIndex)"></button>
+                </div>
             </div>
             <div class="row">
-                <div class="col-8">
+                <div class="col-12 col-md-8">
                     <table class="table table-hover">
-                        <thead style="background-color:#AFBC6C">
-                            <th class="py-2">Menge</th><th>Zutat</th><th />
-                        </thead>
                         <tbody ref="ingredientList">
                             <tr v-for="(ingredient,ingredientIndex) in recipePart.ingredients" :key="'ingredient'+ingredientIndex" draggable="true"
-                                @dragstart="startDrag(ingredient)" @drop="finishDrag" @dragenter="changeOrder(ingredient)">
-                                <td>
-                                    <b>{{ ingredient.order }}</b>
-                                    <input v-model="ingredient.amount" type="number" class="form-control">
-                                    <input v-model="ingredient.unit" type="text" class="form-control">
+                                @dragstart="startDrag(recipePart, ingredient)" @drop="finishDrag" @dragenter="changeOrder(recipePart, ingredient)" class="form-row">
+                                <td class="input-group col-3">
+                                    <input v-model="ingredient.amount" type="number" class="form-control w-50 w-lg-75">
+                                    <input v-model="ingredient.unit" type="text" class="form-control w-lg-25">
                                 </td>
-                                <td>
-                                    <Combobox v-model="ingredient.ingredient.name" style="display: inline-block" :comboValues="existingIngredients"/>
+                                <td class="col-7">
+                                    <Combobox class="w-100" v-model="ingredient.ingredient.name" :comboValues="existingIngredients"/>
                                 </td>
-                                <td class="text-right"><button type="button" class="btn btn-secondary fa fa-trash" @click="deleteIngredient(recipePart.id, ingredientIndex)" /></td>
+                                <td class="col-2 text-right">
+                                    <button type="button" class="btn btn-secondary fa fa-trash form-control" @click="deleteIngredient(recipePart, ingredientIndex)" />
+                                </td>
+                            </tr>
+                            <tr class="form-row">
+                                <td class="col-3"/>
+                                <td class="col-7">
+                                    <textarea class="form-control" :id="'recipePartTextfield' + recipePartIndex" />
+                                </td>
+                                <td class="col-2 text-right">
+                                    <button class="btn btn-secondary fa fa-plus form-control" @click="addIngredient(recipePart, 'recipePartTextfield' + recipePartIndex)" />
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                    <div class="row">
-                        <textarea class="form-control col-8" :id="'recipePartTextfield' + recipePartIndex" />
-                        <button class="btn btn-secondary col-4" @click="addIngredient(recipePart, 'recipePartTextfield' + recipePartIndex)">Zutat hinzufügen</button>
-                    </div>
                 </div>
-                <div class="col-4"><textarea v-model="recipePart.description" rows="7" class="form-control" /></div>
+                <div class="col-12 col-md-4"><textarea v-model="recipePart.description" rows="5" class="form-control mt-2" /></div>
             </div>
         </div>
-        <div class="row">
+        <div class="form-row">
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
-                Zubereitung:
+                Zubereitung
             </b>
-            <div class="col-12 col-sm-10 col-xl-8">
-                <textarea v-model="recipe.description" rows="7" class="form-control" />
+            <div class="col-12 col-sm-9 col-xl-10">
+                <textarea v-model="recipe.description" rows="10" class="form-control" />
             </div>
         </div>
-        <div class="row mt-3">
+        <div class="form-row mt-3 mb-3">
             <b class="col-12 col-sm-3 col-xl-2 col-form-label">
-                Quelle:
+                Quelle
             </b>
-            <div class="col-12 col-sm-7 col-xl-6">
+            <div class="col-12 col-sm-9 col-xl-10">
                 <input v-model="recipe.source" class="form-control">
             </div>
         </div>
@@ -120,20 +125,21 @@ export default {
             await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
             this.$emit('toggleEditMode')
         },
-        addPart () {
-            this.recipe.recipeParts.push({
+        addPart (recipePartIndex) {
+            const newPart = {
                 name: '',
                 description: '',
                 ingredients: [],
-            })
+            }
+            this.recipe.recipeParts.splice(recipePartIndex + 1, 0, newPart)
+            this.addIngredient(newPart)
         },
         deletePart (recipePartIndex) {
             this.recipe.recipeParts.splice(recipePartIndex, 1)
         },
-        deleteIngredient (recipePartID, key) {
-            this.recipe.recipeParts.find(part => part.id === recipePartID).ingredients.splice(key, 1)
+        deleteIngredient (recipePart, key) {
+            recipePart.ingredients.splice(key, 1)
         },
-
         addIngredient (recipePart, inputFieldId) {
             const valuesAsText = document.getElementById(inputFieldId).value
 
@@ -141,23 +147,33 @@ export default {
 
             recipePart.ingredients.push(...ingredients)
         },
-        startDrag (ingredient) {
+        startDrag (recipePart, ingredient) {
             this.draggedIngredient = ingredient
+            this.draggedIngredientRecipePart = recipePart
         },
         finishDrag () {
             this.draggedIngredient = null
+            this.draggedIngredientRecipePart = null
         },
-        changeOrder (ingredient) {
-            const ings = this.recipe.ingredients
+        changeOrder (recipePart, ingredient) {
+            if (recipePart === this.draggedIngredientRecipePart) {
+                // dragging within a recipe part
+                const newIndex = recipePart.ingredients.indexOf(ingredient)
+                const oldIndex = recipePart.ingredients.indexOf(this.draggedIngredient)
 
-            const newIndex = ings.indexOf(ingredient)
-            const oldIndex = ings.indexOf(this.draggedIngredient)
-            ings[newIndex] = this.draggedIngredient
-            ings[oldIndex] = ingredient
-
-            var order = this.draggedIngredient.order
-            this.draggedIngredient.order = ingredient.order
-            ingredient.order = order
+                recipePart.ingredients[newIndex] = this.draggedIngredient
+                recipePart.ingredients[oldIndex] = ingredient
+            } else {
+                // dragging across recipe parts
+                const newIndex = recipePart.ingredients.indexOf(ingredient)
+                const oldIndex = this.draggedIngredientRecipePart.ingredients.indexOf(this.draggedIngredient)
+                // add ingredient to new recipe part
+                recipePart.ingredients.splice(newIndex, 0, ingredient)
+                // remove ingredient from old recipe part
+                this.draggedIngredientRecipePart.ingredients.splice(oldIndex, 1)
+                // draggedIngredient recipe part has now changed
+                this.draggedIngredientRecipePart = recipePart
+            }
         },
         createIngredientsAndAddValuesIfGiven (recipePart, valuesAsText) {
             const textArray = valuesAsText.split('\n')
@@ -198,3 +214,17 @@ export default {
     },
 }
 </script>
+<style scoped>
+/* Hide annoyingly wide up and down arrows on number input fields */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>
