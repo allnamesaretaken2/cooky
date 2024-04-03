@@ -1,5 +1,8 @@
 package de.cooky.data;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.LinkedHashSet;
@@ -35,6 +38,12 @@ public class Recipe {
 	
 	public Recipe() {
 
+	}
+
+	@JsonCreator
+	public Recipe(@JsonProperty("recipeParts") LinkedHashSet<RecipePart> recipeParts){
+		//make sure the json deserialization uses a LinkedHashSet to keep the order in the json array
+		this.recipeParts = recipeParts;
 	}
 
 	public void setId(Long id) {
