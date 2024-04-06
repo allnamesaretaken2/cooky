@@ -93,6 +93,10 @@ public class RecipeService {
 
 		selected.forEach(recipe -> {
 			Boolean selectionValue = newSelectionSettings.get(recipe.getId());
+			if(recipe.getSelected() && selectionValue){
+				//already selected. We don't want to cook the same stuff twice
+				return;
+			}
 			recipe.setSelected(selectionValue);
 
 			if (selectionValue) {

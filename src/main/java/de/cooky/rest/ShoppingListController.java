@@ -2,6 +2,7 @@ package de.cooky.rest;
 
 import java.util.List;
 
+import de.cooky.service.ShoppingItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,20 +22,28 @@ public class ShoppingListController {
 	@Autowired
 	private ShoppingItemRepository shoppingListRepo;
 
+	@Autowired
+	private ShoppingItemService shoopintItemService;
+
 	@GetMapping
 	public List<ShoppingItem> get() {
 
-		return shoppingListRepo.findAll();
+		return shoppingListRepo.findAllByOrderByItemOrderAsc();
 	}
 
 	@PostMapping
 	public List<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
 
-        return shoppingListRepo.saveAll(list);
+		return shoopintItemService.updateOrderAndSaveAll(list);
 	}
 	
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable long id) {
 		shoppingListRepo.deleteById(id);
+	}
+
+	@DeleteMapping
+	public void delete() {
+		shoppingListRepo.deleteAll();
 	}
 }

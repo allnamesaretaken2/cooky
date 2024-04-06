@@ -21,7 +21,7 @@ public class ShoppingItemService {
 
 	public void enhanceShoppingList(List<IngredientToRecipePart> ingredients) {
 
-		List<IngredientToRecipePart> tmp = new ArrayList<IngredientToRecipePart>(ingredients);
+		List<IngredientToRecipePart> tmp = new ArrayList<>(ingredients);
 
 		Map<String, List<IngredientToRecipePart>> ingredientNames = new HashMap<>();
 
@@ -71,4 +71,15 @@ public class ShoppingItemService {
 
 		shoppingItemRepo.saveAll(newItems);
 	}
+
+    public List<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
+
+		int order = 0;
+		for (ShoppingItem shoppingItem : list) {
+			shoppingItem.setItemOrder(order++);
+		}
+
+		return shoppingItemRepo.saveAll(list);
+
+    }
 }

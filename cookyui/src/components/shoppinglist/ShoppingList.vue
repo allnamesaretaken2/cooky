@@ -3,7 +3,6 @@
         <div class="row mt-1">
             <div class="col-12 text-right">
                 <button type="button" class="btn btn-secondary m-1" @click="addNewItem()">Hinzufügen</button>
-                <button type="button" class="btn btn-secondary" @click="chooseRecipes()">Rezepte auswählen</button>
             </div>
         </div>
 
@@ -15,8 +14,8 @@
                 <th />
             </thead>
             <tbody>
-                <tr v-for="(item,key) in items" :key="key" draggable="true" @drop="changeOrder(item, key)" @dragover="allowDrop" @dragstart="ondragstart(item, key)">
-                    <td>{{ item.name }}</td>
+                <tr v-for="(item,key) in items" :key="key" draggable="true" @drop="finishDrag" @dragenter="changeOrder(item)" @dragstart="startDrag(item, key)">
+                    <td><input v-model="item.name" type="text"></td>
                     <td><input v-model="item.amount" type="number"></td>
                     <td><input v-model="item.unit" type="text"></td>
                     <td><button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" /></td>
@@ -26,39 +25,13 @@
 
         <div class="row">
             <div class="col-12 text-right">
+                <button type="button" class="btn btn-secondary m-1" @click="clearList()">Alles neu</button>
                 <button type="button" class="btn btn-secondary m-1" @click="saveList()">Liste speichern</button>
                 <button type="button" class="btn btn-secondary" @click="copyList()">Liste kopieren</button>
             </div>
         </div>
 
         <textarea id="copyField" hidden="true" />
-
-        <!-- Recipe selection popup -->
-        <baseModal ref="modalRecipeSelection">
-            <template #header>
-                Rezept auswählen
-            </template>
-
-            <template #body>
-                <div class="form-row">
-                    <table class="table table-hover">
-                        <thead style="background-color:#AFBC6C">
-                            <th class="py-2">Name</th><th />
-                        </thead>
-                        <tbody>
-                            <tr v-for="(recipe,key) in recipes" :key="key">
-                                <td>{{ recipe.name }}</td>
-                                <input v-model="recipe.checked" type="checkbox" class="form-check-input">
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </template>
-
-            <template #footer>
-                <button type="button" class="col-3 btn btn-outline-primary" @click="closeRecipePopup()">okay</button>
-            </template>
-        </baseModal>
 
         <!-- shopping item edit popup -->
         <baseModal ref="modalItemEdit">
@@ -99,7 +72,6 @@ export default {
             items: [],
             recipes: [],
             draggingItem: null,
-            draggingItemIndex: null,
             // the item that is currently edited in the edit-popup
             itemEdit: null,
         }
@@ -151,6 +123,11 @@ export default {
             window.getSelection().removeAllRanges()
         },
 
+        async clearList () {
+            await window.cookyFetch('/rest/shoppinglist/', 'DELETE')
+            this.items = []
+        },
+
         addNewItem () {
             this.itemEdit = {
                 name: null,
@@ -189,69 +166,19 @@ export default {
                 this.items.splice(key, 1)
             }
         },
-
-        async chooseRecipes () {
-            const response = await fetch('/rest/recipes/', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-            const json = await response.json()
-            this.recipes = json
-
-            this.$refs.modalRecipeSelection.show()
-        },
-
-        allowDrop (ev) {
-            ev.preventDefault()
-        },
-
-        changeOrder (item, key) {
-            const blorp = this.items
-
-            this.items = []
-
-            if (this.draggingItemIndex < key) {
-                for (let currentIdx = this.draggingItemIndex; currentIdx <= key; currentIdx++) {
-                    blorp[currentIdx] = blorp[currentIdx + 1]
-                }
-                blorp[key] = this.draggingItem
-            } else if (this.draggingItemIndex > key) {
-                for (let currentIdx = this.draggingItemIndex; currentIdx >= key; currentIdx--) {
-                    blorp[currentIdx] = blorp[currentIdx - 1]
-                }
-                blorp[key] = this.draggingItem
-            }
-
-            this.items = blorp
-        },
-
-        ondragstart (item, key) {
+        startDrag (item, key) {
             this.draggingItem = item
-            this.draggingItemIndex = key
         },
-
-        closeRecipePopup () {
-            this.$refs.modalRecipeSelection.close()
-            this.recipes.forEach(recipe => {
-                if (!recipe.checked) {
-                    return
-                }
-
-                recipe.ingredients.forEach(ingredient => {
-                    const foundItemArray = this.items.filter(item => {
-                        return item.name === ingredient.ingredient.name
-                    })
-
-                    if (foundItemArray.length === 0) {
-                        this.items.push({
-                            name: ingredient.ingredient.name,
-                            amount: ingredient.amount,
-                        })
-                    } else {
-                        const item = foundItemArray[0]
-                        item.amount += ingredient.amount
-                    }
-                })
-            })
+        finishDrag () {
+            this.draggingItem = null
         },
+        changeOrder (item) {
+            const newIndex = this.items.indexOf(item)
+            const oldIndex = this.items.indexOf(this.draggingItem)
 
+            this.items[newIndex] = this.draggingItem
+            this.items[oldIndex] = item
+        },
         async saveList () {
             try {
                 const response = await fetch('/rest/shoppinglist/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.items) })

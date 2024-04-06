@@ -25,7 +25,6 @@
 </template>
 
 <script>
-
 export default {
     name: 'App',
     data () {
@@ -33,7 +32,6 @@ export default {
             cookyNotifications: [],
         }
     },
-
     methods: {
         removeNotification (notification, key) {
             this.cookyNotifications.pop(notification)

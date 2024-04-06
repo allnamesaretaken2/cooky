@@ -11,4 +11,6 @@ public interface ShoppingItemRepository extends JpaRepository<ShoppingItem, Long
 
 	List<ShoppingItem> findByNameIn(Set<String> ingredientNames);
 
+	List<ShoppingItem> findAllByOrderByItemOrderAsc();
+
 }

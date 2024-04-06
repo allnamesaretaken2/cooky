@@ -1,10 +1,13 @@
 <template>
     <div>
         <div class="row mt-2">
-            <div class="col-10 col-xl-8">
+            <div class="col-8 col-xl-8">
                 <h3>{{ recipe.name }}</h3>
             </div>
-            <div class="col-2 ml-auto text-right">
+            <div class="col-3 ml-auto">
+                <h4><i class="fa fa-check-square-o" @click="showStuff()" >Zutaten abhaken</i></h4>
+            </div>
+            <div class="col-1 ml-auto text-right">
                 <h4><i class="fa fa-edit" @click="$emit('toggleEditMode')" /></h4>
             </div>
         </div>
@@ -24,6 +27,7 @@
                 <span>{{ recipe.durationInMinutes }} Minuten</span>
             </div>
         </div>
+        <ModalIngredientChecklist ref="ModalIngredientChecklist" :recipe="recipe" />
         <div v-for="(recipePart, key) in recipe.recipeParts" :key="key">
             <div class="row mt-3"><div class="col"><b>{{recipePart.name}}</b></div></div>
             <div class="row">
@@ -56,10 +60,13 @@
 </template>
 
 <script>
+import ModalIngredientChecklist from '../ModalIngredientChecklist.vue'
 
 export default {
     name: 'ShowRecipe',
-    components: {},
+    components: {
+        ModalIngredientChecklist,
+    },
     data: function () {
         return {
             recipe: {},
@@ -74,6 +81,9 @@ export default {
             const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const json = await response.json()
             this.recipe = json
+        },
+        showStuff () {
+            this.$refs.ModalIngredientChecklist.show()
         },
     },
 }

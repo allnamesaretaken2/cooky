@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 col-md-6">
 
-            <h4 class="mt-2">Liste aller Rezepte</h4>
+            <h4 class="mt-2">Rezepte</h4>
 
             <div>
                 <input v-model="searchText" type="text" class="col-4">
@@ -44,7 +44,7 @@
 
         <div class="col-12 col-md-6">
 
-            <h4 class="mt-2">Ausgewählte Rezepte</h4>
+            <h4 class="mt-2">Das wollen wir demnächst kochen</h4>
 
             <div>
                 <button class="btn btn-secondary" @click="unselectAll()">Leeren</button>
@@ -110,8 +110,7 @@ export default {
             if (this.searchText) {
                 url += '?name=' + this.searchText
             }
-
-            const response = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const response = await window.cookyFetch(url, 'GET')
             const json = await response.json()
             this.recipes = json
 
@@ -124,7 +123,7 @@ export default {
             this.showLoadingSpinnerSelected = true
 
             try {
-                const response = await fetch('/rest/recipes/selected', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                const response = await window.cookyFetch('/rest/recipes/selected', 'GET')
                 const json = await response.json()
                 this.selectedRecipes = json
             } catch (error) {
@@ -144,6 +143,8 @@ export default {
             this.$refs.modalDeleteRecipe.show(recipe)
         },
         setSelection (recipe, select) {
+            const alreadySelected = this.selectedRecipes.filter(selectedRecipe => selectedRecipe.id === recipe.id)
+
             if (recipe.temporarySelected === true && select === false) {
                 const idx = this.selectedRecipes.indexOf(recipe)
                 this.selectedRecipes.pop(idx)
@@ -155,7 +156,8 @@ export default {
                 this.$forceUpdate()
             }
 
-            if (select) {
+            if (select && alreadySelected.length === 0) {
+                // only add the recipe if it wasn't already added
                 this.selectedRecipes.push(recipe)
             }
         },
@@ -183,16 +185,7 @@ export default {
         },
 
         async addToShoppingList () {
-            const recipeKeys = []
-
-            this.selectedRecipes.filter(recipe => {
-                if (recipe.temporarySelected === true) {
-                    recipeKeys.push(recipe.id)
-                }
-                return undefined
-            })
-
-            this.saveTemporarySelection()
+            await this.saveTemporarySelection()
 
             this.$router.push({ path: '/shoppingList' })
         },

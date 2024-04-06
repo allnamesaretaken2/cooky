@@ -21,7 +21,7 @@ public class CookyExceptionHandler {
 
 		LOG.error("exception", e);
 
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{ \"errorMsg\" : \"" + e.getMessage() + "\"}");
 	}
 
 }

@@ -23,6 +23,7 @@
                 <input v-model="recipe.durationInMinutes" class="form-control">
             </div>
         </div>
+        <button class="btn btn-secondary form-control fa fa-plus my-1" @click="addPart()" v-if="!anyPartsExisting"></button>
         <div v-for="(recipePart, recipePartIndex) in recipe.recipeParts" :key="'recipePart'+recipePart.id">
             <div class="form-row mt-4" style="background-color:#AFBC6C" >
                 <div class="col-12 col-sm-3 col-xl-2 col-form-label">
@@ -103,6 +104,11 @@ export default {
             draggedIngredient: null,
         }
     },
+    computed: {
+        anyPartsExisting: function () {
+            return this.recipe.recipeParts && this.recipe.recipeParts.length > 0
+        },
+    },
     props: ['recipeID'],
     mounted () {
         this.getRecipe()
@@ -122,10 +128,14 @@ export default {
         },
 
         async saveRecipe () {
-            await fetch('/rest/recipes/' + this.recipe.id, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.recipe) })
+            await window.cookyFetch('/rest/recipes/' + this.recipe.id, 'PUT', JSON.stringify(this.recipe))
             this.$emit('toggleEditMode')
         },
         addPart (recipePartIndex) {
+            if (recipePartIndex === undefined) {
+                recipePartIndex = 0
+            }
+
             const newPart = {
                 name: '',
                 description: '',
@@ -141,7 +151,11 @@ export default {
             recipePart.ingredients.splice(key, 1)
         },
         addIngredient (recipePart, inputFieldId) {
-            const valuesAsText = document.getElementById(inputFieldId).value
+            let valuesAsText = ''
+
+            if (inputFieldId) {
+                valuesAsText = document.getElementById(inputFieldId).value
+            }
 
             const ingredients = this.createIngredientsAndAddValuesIfGiven(recipePart, valuesAsText)
 
