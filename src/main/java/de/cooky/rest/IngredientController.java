@@ -20,22 +20,10 @@ import java.util.Set;
 public class IngredientController {
 
     @Autowired
-    private RecipeService recipeService;
-
-    @Autowired
     private IngredientRepository ingredientRepo;
 
     @Autowired
     private RecipeRepository recipeRepo;
-
-    @PostMapping("/insertFromString/{recipeName}")
-    public ResponseEntity<Boolean> create(@RequestBody String ingredientsAsStringBlobb, @PathVariable String recipeName) {
-
-        Recipe recipe = recipeService.insertFromString(ingredientsAsStringBlobb, recipeName);
-
-        //TODO better response, please
-        return ResponseEntity.accepted().body(true);
-    }
 
     @GetMapping("getByRecipe/{recipeName}")
     public Set<IngredientToRecipePart> getByRecipe(@PathVariable String recipeName){

@@ -17,11 +17,7 @@
             </div>
             <div class="form-row">
                 <label class="col-3">Portionen</label>
-                <input v-model="newRecipe.persons" class="col-9 form-control">
-            </div>
-            <div class="form-row">
-                <label class="col-3">Zutaten</label>
-                <textarea v-model="ingredientsAsString" class="col-9 form-control" rows="8" />
+                <input v-model="newRecipe.persons" class="col-9 form-control" type="number">
             </div>
             <div class="form-row">
                 <label class="col-3">Beschreibung</label>
@@ -69,17 +65,6 @@ export default {
 
         async submitAndClose () {
             await fetch('/rest/recipes/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.newRecipe) })
-            const recipeName = this.newRecipe.name
-
-            await fetch('/rest/ingredients/insertFromString/' + recipeName,
-                { method: 'POST', headers: { 'Content-Type': 'application/text' }, body: this.ingredientsAsString.replaceAll('\n', ';') })
-                .then(function (response) {
-                    if (!response.ok) {
-                        throw Error(response.statusText)
-                    }
-                    return response
-                },
-                )
 
             this.callback()
             this.$refs.baseModal.close()

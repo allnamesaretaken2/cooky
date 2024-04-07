@@ -38,10 +38,18 @@ public class RecipeService {
 	}
 
 	private void updateIngredients(Recipe recipe) {
+		if(recipe.getRecipeParts() == null){
+			return;
+		}
 
 		//also recreate the order so that it fixes gaps or other issues in the list
 		for(RecipePart part : recipe.getRecipeParts()){
+			if(part.getIngredients()== null){
+				continue;
+			}
+
 			int counter = 0;
+
 			for (IngredientToRecipePart ingr : part.getIngredients()) {
 				Ingredient ingredient = ingr.getIngredient();
 
@@ -107,20 +115,5 @@ public class RecipeService {
 		});
 
 		shoppingItemService.enhanceShoppingList(ingredients);
-	}
-
-	public Recipe insertFromString(String ingredientsAsString, String recipeName){
-		Set<IngredientToRecipePart> ingredients = ingredientService.createIngredientsFromString(ingredientsAsString);
-
-		Recipe recipe = recipeRepo.findByName(recipeName);
-
-		if(recipe == null){
-			//TODO throw recipe not found error
-		}
-
-		//TODO a bit optimistic, ain' it?
-		recipe.getRecipeParts().iterator().next().getIngredients().addAll(ingredients);
-
-		return recipe;
 	}
 }
