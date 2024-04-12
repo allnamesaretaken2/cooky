@@ -32,6 +32,9 @@ public class ChefkochImportService {
 	@Autowired
 	private IngredientService ingredientService;
 
+	@Autowired
+	private RecipeService recipeService;
+
 	/**
 	 * Convert a chefkoch-recipe into a cooky-recipe. It does not save the recipe
 	 */
@@ -51,6 +54,8 @@ public class ChefkochImportService {
 			recipe.getRecipeParts().iterator().next().setIngredients(itrSet);
 
 			LOG.info("finished import of recipe from url " + url);
+
+			recipeService.create(recipe);
 			
 			return recipe;
 

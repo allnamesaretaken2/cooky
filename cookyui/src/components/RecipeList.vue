@@ -8,6 +8,7 @@
                 <input v-model="searchText" type="text" class="col-4">
                 <button class="btn btn-secondary " @click="getRecipeList()">Suchen</button>
                 <button type="button" class="btn btn-secondary" @click="addRecipe()">Hinzufügen</button>
+                <button type="button" class="btn btn-secondary" @click="openImportModal()">Importieren</button>
             </div>
 
             <table class="table table-hover">
@@ -38,7 +39,7 @@
                 </div>
             </div>
 
-            <modal-add-recipe ref="modalAddRecipe" :callback="getRecipeList" />
+            <modal-import-recipe ref="modalImportRecipe" :callback="getRecipeList" />
             <modal-delete-recipe ref="modalDeleteRecipe" :callback="getRecipeList" />
         </div>
 
@@ -77,13 +78,13 @@
 </template>
 
 <script>
-import ModalAddRecipe from './ModalAddRecipe.vue'
+import ModalImportRecipe from './ModalImportRecipe.vue'
 import ModalDeleteRecipe from './ModalDeleteRecipe.vue'
 
 export default {
     name: 'RecipeList',
     components: {
-        ModalAddRecipe,
+        ModalImportRecipe,
         ModalDeleteRecipe,
     },
     data: function () {
@@ -134,10 +135,13 @@ export default {
         },
 
         openRecipe (recipeId) {
-            this.$router.push('/recipe/' + recipeId)
+            this.$router.push('/recipe?id=' + recipeId + '&editMode=false')
         },
         addRecipe () {
-            this.$refs.modalAddRecipe.show()
+            this.$router.push('/recipe/?editMode=true')
+        },
+        openImportModal () {
+            this.$refs.modalImportRecipe.show()
         },
         deleteRecipe (recipe) {
             this.$refs.modalDeleteRecipe.show(recipe)

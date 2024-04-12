@@ -16,9 +16,12 @@ export default {
         ShowRecipe,
     },
     data: function () {
+        const editModeAsstring = this.$route.query.editMode
+        const editMode = editModeAsstring === 'true'
+
         return {
-            recipeID: this.$route.params.id,
-            editMode: false,
+            recipeID: this.$route.query.id,
+            editMode: editMode,
         }
     },
     methods: {

@@ -116,9 +116,13 @@ export default {
     },
     methods: {
         async getRecipe () {
-            const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-            const json = await response.json()
-            this.recipe = json
+            if (this.recipeID) {
+                const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                const json = await response.json()
+                this.recipe = json
+            } else {
+                this.recipe = {}
+            }
         },
 
         async getIngredients () {
@@ -128,10 +132,19 @@ export default {
         },
 
         async saveRecipe () {
-            await window.cookyFetch('/rest/recipes/' + this.recipe.id, 'PUT', JSON.stringify(this.recipe))
-            this.$emit('toggleEditMode')
+            if (this.recipe.id) {
+                await window.cookyFetch('/rest/recipes/' + this.recipe.id, 'PUT', JSON.stringify(this.recipe))
+                this.$emit('toggleEditMode')
+            } else {
+                await window.cookyFetch('/rest/recipes/', 'POST', JSON.stringify(this.recipe))
+                this.$router.push('/')
+            }
         },
         addPart (recipePartIndex) {
+            if (!this.recipe.recipeParts) {
+                this.recipe.recipeParts = []
+            }
+
             if (recipePartIndex === undefined) {
                 recipePartIndex = 0
             }
