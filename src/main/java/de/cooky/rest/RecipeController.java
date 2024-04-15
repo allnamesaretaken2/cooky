@@ -6,6 +6,7 @@ import de.cooky.service.ChefkochImportService;
 import de.cooky.service.RecipeService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -31,7 +32,7 @@ public class RecipeController {
 	public List<Recipe> getAll(@RequestParam(required = false) String name) {
 
 		if (StringUtils.isEmpty(name)) {
-			return recipeRepo.findAll();
+			return recipeRepo.findAll(Sort.by(Sort.Order.asc("name").ignoreCase()));
 		} else {
 			return recipeRepo.findByNameContainingIgnoreCase(name);
 		}

@@ -14,8 +14,8 @@
             <table class="table table-hover">
                 <thead style="background-color:#AFBC6C">
                     <th class="py-2">Name</th>
-                    <th class="py-2">Dauer in Min.</th>
-                    <th />
+                    <th class="py-2">Min.</th>
+                    <th class="py-2">Actions</th>
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in recipes" :key="key">
@@ -23,11 +23,13 @@
                             <h5>{{ recipe.name }}</h5>
                         </td>
                         <td @click="openRecipe(recipe.id)">
-                            <h5>{{ recipe.durationInMinutes }}</h5>
+                            <h5>{{recipe.durationInMinutes }}</h5>
                         </td>
-                        <td class="text-right">
-                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)" />
-                            <button type="button" class="btn btn-secondary fa fa-trash" @click="deleteRecipe(recipe)" />
+                        <td class="text-right" style="width: 120px;">
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)"
+                                    data-mdb-tooltip-init title="Zum kochen auswählen" />
+                            <button type="button" class="btn btn-secondary fa fa-trash" @click="deleteRecipe(recipe)"
+                                    data-mdb-tooltip-init title="weg damit" />
                         </td>
                     </tr>
                 </tbody>
