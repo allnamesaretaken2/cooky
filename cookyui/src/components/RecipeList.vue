@@ -58,7 +58,8 @@
                     <th class="py-2">Name</th><th />
                 </thead>
                 <tbody>
-                    <tr v-for="(recipe,key) in selectedRecipes" :key="key" :class="{'selected':recipe.temporarySelected === true, 'unselected':recipe.temporarySelected === false}">
+                    <tr v-for="(recipe,key) in selectedEntries" :key="key" :class="{'selected':recipe.temporarySelected === true, 'unselected':recipe.temporarySelected === false}"
+                        draggable="true" @drop="finishDrag" @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
                         <td @click="openRecipe(recipe.id)">
                             <h5>{{ recipe.name }}</h5>
                         </td>
@@ -92,15 +93,16 @@ export default {
     data: function () {
         return {
             recipes: [],
-            selectedRecipes: [],
+            selectedEntries: [],
             searchText: null,
             showLoadingSpinner: false,
             showLoadingSpinnerSelected: false,
+            draggingItem: null,
         }
     },
     mounted: function () {
         this.getRecipeList()
-        this.getSelectedRecipes()
+        this.getSelectedEntries()
     },
     methods: {
         async getRecipeList () {
@@ -120,15 +122,15 @@ export default {
             this.showLoadingSpinner = false
         },
 
-        async getSelectedRecipes () {
-            this.selectedRecipes = []
+        async getSelectedEntries () {
+            this.selectedEntries = []
 
             this.showLoadingSpinnerSelected = true
 
             try {
-                const response = await window.cookyFetch('/rest/recipes/selected', 'GET')
+                const response = await window.cookyFetch('/rest/selectedentry', 'GET')
                 const json = await response.json()
-                this.selectedRecipes = json
+                this.selectedEntries = json
             } catch (error) {
                 console.log('Error: ', error)
             }
@@ -149,11 +151,11 @@ export default {
             this.$refs.modalDeleteRecipe.show(recipe)
         },
         setSelection (recipe, select) {
-            const alreadySelected = this.selectedRecipes.filter(selectedRecipe => selectedRecipe.id === recipe.id)
+            const alreadySelected = this.selectedEntries.filter(selectedRecipe => selectedRecipe.name === recipe.name)
 
             if (recipe.temporarySelected === true && select === false) {
-                const idx = this.selectedRecipes.indexOf(recipe)
-                this.selectedRecipes.pop(idx)
+                const idx = this.selectedEntries.indexOf(recipe)
+                this.selectedEntries.pop(idx)
             }
 
             recipe.temporarySelected = select
@@ -164,27 +166,21 @@ export default {
 
             if (select && alreadySelected.length === 0) {
                 // only add the recipe if it wasn't already added
-                this.selectedRecipes.push(recipe)
+                this.selectedEntries.push(recipe)
             }
         },
 
         async saveTemporarySelection () {
-            const newlySelectedRecipes = this.selectedRecipes.filter(recipe => recipe.temporarySelected === true || recipe.temporarySelected === false)
-
-            if (newlySelectedRecipes.length === 0) {
-                return
-            }
-
             this.showLoadingSpinnerSelected = true
 
             const body = {}
 
-            newlySelectedRecipes.forEach(recipe => { body[recipe.id] = recipe.temporarySelected })
+            this.selectedEntries.forEach(recipe => { body[recipe.name] = recipe.temporarySelected === undefined ? null : recipe.temporarySelected })
 
-            const response = await fetch('/rest/recipes/select/', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            const response = await window.cookyFetch('/rest/selectedentry/select/', 'PUT', JSON.stringify(body))
 
             if (response.ok) {
-                this.getSelectedRecipes()
+                this.getSelectedEntries()
             } else {
                 this.showLoadingSpinnerSelected = false
             }
@@ -192,8 +188,20 @@ export default {
 
         async addToShoppingList () {
             await this.saveTemporarySelection()
+        },
 
-            this.$router.push({ path: '/shoppingList' })
+        startDrag (item) {
+            this.draggingItem = item
+        },
+        finishDrag () {
+            this.draggingItem = null
+        },
+        changeOrder (item) {
+            const newIndex = this.selectedEntries.indexOf(item)
+            const oldIndex = this.selectedEntries.indexOf(this.draggingItem)
+
+            this.selectedEntries[newIndex] = this.draggingItem
+            this.selectedEntries[oldIndex] = item
         },
     },
 }

@@ -16,6 +16,4 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 	List<Recipe> findByNameContainingIgnoreCase(String name);
 	
 	List<Recipe> findBySelected(boolean selected);
-
-	List<Recipe> findByIdIn(Set<Long> recipeIds);
 }

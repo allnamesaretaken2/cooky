@@ -43,12 +43,6 @@ public class RecipeController {
 		return recipeRepo.findBySelected(true);
 	}
 
-	@PutMapping("/select")
-	public void Selected(@RequestBody Map<Long, Boolean> selectionSettings) {
-
-		recipeService.setSelection(selectionSettings);
-	}
-
 	@GetMapping("{id}")
 	public Recipe getOne(@PathVariable long id) {
 

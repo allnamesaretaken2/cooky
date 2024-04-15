@@ -12,10 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -26,9 +22,6 @@ public class RecipeService {
 
 	@Autowired
 	private IngredientService ingredientService;
-
-	@Autowired
-	private ShoppingItemService shoppingItemService;
 
 	public Recipe create(Recipe recipe) {
 
@@ -84,36 +77,5 @@ public class RecipeService {
 		recipe = recipeRepo.save(recipe);
 
 		return recipe;
-
-	}
-
-	public void setSelection(Map<Long, Boolean> newSelectionSettings) {
-
-		Set<Long> recipeIds = newSelectionSettings.keySet();
-
-		if (newSelectionSettings.isEmpty()) {
-			throw new CookyErrorMsg("cannot set the selection-flag of recipes. No Ids were given.");
-		}
-
-		List<Recipe> selected = recipeRepo.findByIdIn(recipeIds);
-
-		List<IngredientToRecipePart> ingredients = new ArrayList<>();
-
-		selected.forEach(recipe -> {
-			Boolean selectionValue = newSelectionSettings.get(recipe.getId());
-			if(recipe.getSelected() && selectionValue){
-				//already selected. We don't want to cook the same stuff twice
-				return;
-			}
-			recipe.setSelected(selectionValue);
-
-			if (selectionValue) {
-				for (RecipePart recipePart : recipe.getRecipeParts()) {
-					ingredients.addAll(recipePart.getIngredients());
-				}
-			}
-		});
-
-		shoppingItemService.enhanceShoppingList(ingredients);
 	}
 }

@@ -16,6 +16,7 @@ public class Recipe {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	//does the notblank-annotation even work?
 	@NotBlank
 	private String name;
 
