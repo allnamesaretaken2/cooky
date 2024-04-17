@@ -62,11 +62,16 @@
                         draggable="true" @drop="finishDrag" @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
                         <td @click="openRecipe(recipe.name)">
                             <h5>{{ recipe.name }}</h5>
+                            <span v-if="recipe.comment" class="commentColor">{{recipe.comment}}</span>
                         </td>
-                        <td class="text-right"><button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="setSelection(recipe, false)" /></td>
+                        <td class="text-right">
+                            <button type="button" class="btn btn-secondary fa fa-pencil-square-o" @click="setComment(recipe)" />
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="setSelection(recipe, false)" />
+                        </td>
                     </tr>
                 </tbody>
             </table>
+            <modal-change-entry-comment ref="changeCommentModal"/>
 
             <div v-show="showLoadingSpinnerSelected" class="row mt-4">
                 <div class="spinner-border mx-auto" role="status">
@@ -82,11 +87,13 @@
 
 <script>
 import ModalImportRecipe from './ModalImportRecipe.vue'
+import ModalChangeEntryComment from './ModalChangeEntryComment.vue'
 
 export default {
     name: 'RecipeList',
     components: {
         ModalImportRecipe,
+        ModalChangeEntryComment,
     },
     data: function () {
         return {
@@ -221,6 +228,13 @@ export default {
             }
             this.getRecipeList()
         },
+        setComment (selectedEntry) {
+            const callback = (newComment) => {
+                selectedEntry.comment = newComment
+            }
+
+            this.$refs.changeCommentModal.show(selectedEntry, callback)
+        },
     },
 }
 </script>
@@ -233,6 +247,9 @@ export default {
 
 .unselected{
     background-color: pink;
+}
+.commentColor{
+    color: gray;
 }
 
 </style>

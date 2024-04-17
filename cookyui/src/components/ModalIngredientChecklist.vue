@@ -10,16 +10,15 @@
             </div>
 
             <div class="container overflow-y-scroll height : 100px" >
-                <div v-for="(ingredient, key) in ingredients" :key="key" class="row">
-                    <div class="col" style="background-color: lightgrey; " @click="setFound(ingredient)">
-                        <label :class="{ found: ingredient.found}">{{ingredient.ingredient.name}}</label>
-                    </div>
+                <div v-for="(ingredient, key) in ingredients" :key="key" class="row"
+                     :class="{ checkedbackground: ingredient.found}" @click="setFound(ingredient)">
+                    <label>{{ingredient.amount}} {{ingredient.unit}} {{ingredient.ingredient.name}}</label>
                 </div>
             </div>
         </template>
 
         <template #footer>
-            <button type="button" class="btn btn-outline-info" @click="$refs.baseModal.close()">Schließen</button>
+            <button type="button" class="btn btn-primary" @click="$refs.baseModal.close()">Schließen</button>
         </template>
     </baseModal>
 </template>
@@ -62,7 +61,8 @@ export default {
 </script>
 
 <style scoped>
-.found{
-    text-decoration: line-through;
+.checkedbackground{
+    background-color: lightgreen;
 }
+
 </style>

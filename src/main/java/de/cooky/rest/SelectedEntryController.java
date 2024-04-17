@@ -35,4 +35,10 @@ public class SelectedEntryController {
 
         selectedEntryService.setSelection(selectionSettings);
     }
+
+    @PutMapping("/setComment/{id}")
+    public void setComment(@RequestBody( required = false) String comment, @PathVariable Long id){
+
+        selectedEntryService.setComment(id, comment);
+    }
 }

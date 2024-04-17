@@ -53,7 +53,12 @@ public class ShoppingItemService {
 					continue;
 				}
 
-				item.setAmount(item.getAmount() + itr.getAmount());
+				if(item.getAmount() == null)
+				{
+					item.setAmount(itr.getAmount());
+				}else if(itr.getAmount() != null){
+					item.setAmount(item.getAmount() + itr.getAmount());
+				}
 				tmp.remove(itr);
 			}
 		}

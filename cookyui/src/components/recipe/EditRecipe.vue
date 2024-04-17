@@ -117,7 +117,7 @@ export default {
     methods: {
         async getRecipe () {
             if (this.recipeName) {
-                const response = await fetch('/rest/recipes/' + this.recipeName, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                const response = await window.cookyFetch('/rest/recipes/' + this.recipeName, 'GET')
                 const json = await response.json()
                 this.recipe = json
             } else {
@@ -168,6 +168,7 @@ export default {
 
             if (inputFieldId) {
                 valuesAsText = document.getElementById(inputFieldId).value
+                document.getElementById(inputFieldId).value = null
             }
 
             const ingredients = this.createIngredientsAndAddValuesIfGiven(recipePart, valuesAsText)
@@ -202,6 +203,10 @@ export default {
                 this.draggedIngredientRecipePart = recipePart
             }
         },
+        /**
+         * @param {Object} recipePart the recipe part to which the ingredients will be added
+         * @param {String} valuesAsText optional. If given this contains several ingredients as a single string
+         */
         createIngredientsAndAddValuesIfGiven (recipePart, valuesAsText) {
             const textArray = valuesAsText.split('\n')
             const ingredientArray = []
@@ -209,7 +214,7 @@ export default {
 
             textArray.forEach(textForIngredient => {
                 const ingredient = {
-                    amount: 1,
+                    amount: null,
                     unit: '',
                     order: counter++,
                     ingredient: {
@@ -224,7 +229,7 @@ export default {
         },
         squeezeValuesIntoIngredient (ingredient, valuesAsText) {
             if (valuesAsText.length !== 0) {
-                const ingredientParts = valuesAsText.split(' ')
+                const ingredientParts = valuesAsText.trim().split(' ')
 
                 if (ingredientParts.length === 1) {
                     ingredient.ingredient.name = ingredientParts[0]

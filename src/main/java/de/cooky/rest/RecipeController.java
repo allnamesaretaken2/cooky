@@ -1,6 +1,7 @@
 package de.cooky.rest;
 
 import de.cooky.data.Recipe;
+import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
 import de.cooky.service.ChefkochImportService;
 import de.cooky.service.RecipeService;
@@ -46,7 +47,11 @@ public class RecipeController {
 	@GetMapping("{recipeName}")
 	public Recipe getOne(@PathVariable String recipeName) {
 
-		return recipeRepo.findByName(recipeName);
+		Recipe recipe = recipeRepo.findByName(recipeName);
+		if(recipe == null){
+			throw new CookyErrorMsg("Kein Rezept mit Namen " + recipeName + " gefunden");
+		}
+		return recipe;
 	}
 
 	@DeleteMapping("{id}")

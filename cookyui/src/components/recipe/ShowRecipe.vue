@@ -78,7 +78,7 @@ export default {
     },
     methods: {
         async getRecipe () {
-            const response = await fetch('/rest/recipes/' + this.recipeName, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const response = await window.cookyFetch('/rest/recipes/' + this.recipeName, 'GET')
             const json = await response.json()
             this.recipe = json
         },

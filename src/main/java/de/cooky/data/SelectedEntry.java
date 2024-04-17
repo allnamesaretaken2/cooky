@@ -21,6 +21,8 @@ public class SelectedEntry {
 	@NotBlank
 	private String name;
 
+	private String comment;
+
 	private int sortOrder;
 
 	public void setId(Long id) {
@@ -45,5 +47,13 @@ public class SelectedEntry {
 
 	public int getSortOrder() {
 		return sortOrder;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public String getComment() {
+		return comment;
 	}
 }

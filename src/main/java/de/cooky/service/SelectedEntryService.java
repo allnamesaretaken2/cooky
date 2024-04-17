@@ -10,11 +10,13 @@ import de.cooky.repository.SelectedEntryRepository;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@Transactional
 public class SelectedEntryService {
 
 	@Autowired
@@ -74,5 +76,10 @@ public class SelectedEntryService {
 		selectedEntryRepo.saveAll(entries);
 		selectedEntryRepo.deleteAll(entriesToDelete);
 		shoppingItemService.enhanceShoppingList(ingredients);
+	}
+
+	public void setComment(Long id, String comment) {
+		SelectedEntry entry = selectedEntryRepo.getOne(id);
+		entry.setComment(comment);
 	}
 }
