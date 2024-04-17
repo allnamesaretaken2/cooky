@@ -1,7 +1,7 @@
 <template>
     <div>
-        <template v-if="editMode"><EditRecipe :recipeID="recipeID" @toggleEditMode="toggleEditMode()"/></template>
-        <template v-else><ShowRecipe :recipeID="recipeID" @toggleEditMode="toggleEditMode()"/></template>
+        <template v-if="editMode"><EditRecipe :recipeName="recipeName" @toggleEditMode="toggleEditMode()"/></template>
+        <template v-else><ShowRecipe :recipeName="recipeName" @toggleEditMode="toggleEditMode()"/></template>
     </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
         const editMode = editModeAsstring === 'true'
 
         return {
-            recipeID: this.$route.query.id,
+            recipeName: this.$route.query.name,
             editMode: editMode,
         }
     },

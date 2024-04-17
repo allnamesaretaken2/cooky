@@ -43,10 +43,10 @@ public class RecipeController {
 		return recipeRepo.findBySelected(true);
 	}
 
-	@GetMapping("{id}")
-	public Recipe getOne(@PathVariable long id) {
+	@GetMapping("{recipeName}")
+	public Recipe getOne(@PathVariable String recipeName) {
 
-		return recipeRepo.findById(id).get();
+		return recipeRepo.findByName(recipeName);
 	}
 
 	@DeleteMapping("{id}")

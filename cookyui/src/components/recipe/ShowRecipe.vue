@@ -72,13 +72,13 @@ export default {
             recipe: {},
         }
     },
-    props: ['recipeID'],
+    props: ['recipeName'],
     mounted () {
         this.getRecipe()
     },
     methods: {
         async getRecipe () {
-            const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const response = await fetch('/rest/recipes/' + this.recipeName, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const json = await response.json()
             this.recipe = json
         },

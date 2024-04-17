@@ -109,15 +109,15 @@ export default {
             return this.recipe.recipeParts && this.recipe.recipeParts.length > 0
         },
     },
-    props: ['recipeID'],
+    props: ['recipeName'],
     mounted () {
         this.getRecipe()
         this.getIngredients()
     },
     methods: {
         async getRecipe () {
-            if (this.recipeID) {
-                const response = await fetch('/rest/recipes/' + this.recipeID, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            if (this.recipeName) {
+                const response = await fetch('/rest/recipes/' + this.recipeName, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
                 const json = await response.json()
                 this.recipe = json
             } else {

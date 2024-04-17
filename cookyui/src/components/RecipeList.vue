@@ -19,16 +19,16 @@
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in recipes" :key="key">
-                        <td @click="openRecipe(recipe.id)">
+                        <td @click="openRecipe(recipe.name)">
                             <h5>{{ recipe.name }}</h5>
                         </td>
-                        <td @click="openRecipe(recipe.id)">
+                        <td @click="openRecipe(recipe.name)">
                             <h5>{{recipe.durationInMinutes }}</h5>
                         </td>
                         <td class="text-right" style="width: 120px;">
                             <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)"
                                     data-mdb-tooltip-init title="Zum kochen auswählen" />
-                            <button type="button" class="btn btn-secondary fa fa-trash" @click="deleteRecipe(recipe)"
+                            <button type="button" class="btn btn-secondary fa fa-trash" @click="openDeleteRecipePopup(recipe)"
                                     data-mdb-tooltip-init title="weg damit" />
                         </td>
                     </tr>
@@ -42,7 +42,7 @@
             </div>
 
             <modal-import-recipe ref="modalImportRecipe" :callback="getRecipeList" />
-            <modal-delete-recipe ref="modalDeleteRecipe" :callback="getRecipeList" />
+            <modal-yes-cancel ref="modalYesCancel" />
         </div>
 
         <div class="col-12 col-md-6">
@@ -60,7 +60,7 @@
                 <tbody>
                     <tr v-for="(recipe,key) in selectedEntries" :key="key" :class="{'selected':recipe.temporarySelected === true, 'unselected':recipe.temporarySelected === false}"
                         draggable="true" @drop="finishDrag" @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
-                        <td @click="openRecipe(recipe.id)">
+                        <td @click="openRecipe(recipe.name)">
                             <h5>{{ recipe.name }}</h5>
                         </td>
                         <td class="text-right"><button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="setSelection(recipe, false)" /></td>
@@ -82,13 +82,11 @@
 
 <script>
 import ModalImportRecipe from './ModalImportRecipe.vue'
-import ModalDeleteRecipe from './ModalDeleteRecipe.vue'
 
 export default {
     name: 'RecipeList',
     components: {
         ModalImportRecipe,
-        ModalDeleteRecipe,
     },
     data: function () {
         return {
@@ -138,8 +136,8 @@ export default {
             this.showLoadingSpinnerSelected = false
         },
 
-        openRecipe (recipeId) {
-            this.$router.push('/recipe?id=' + recipeId + '&editMode=false')
+        openRecipe (recipeName) {
+            this.$router.push('/recipe?name=' + recipeName + '&editMode=false')
         },
         addRecipe () {
             this.$router.push('/recipe/?editMode=true')
@@ -147,8 +145,20 @@ export default {
         openImportModal () {
             this.$refs.modalImportRecipe.show()
         },
-        deleteRecipe (recipe) {
-            this.$refs.modalDeleteRecipe.show(recipe)
+        openDeleteRecipePopup (recipe) {
+            const me = this
+            const callback = function () {
+                me.deleteRecipe(recipe)
+            }
+            this.$refs.modalYesCancel.show(callback, 'Rezept löschen', 'schmeckt nicht?')
+        },
+        async unselectAll () {
+            const me = this
+            const callback = async function () {
+                await window.cookyFetch('/rest/selectedentry', 'DELETE')
+                me.getSelectedEntries()
+            }
+            this.$refs.modalYesCancel.show(callback, 'Auswahl abräumen', 'Alles neu?')
         },
         setSelection (recipe, select) {
             const alreadySelected = this.selectedEntries.filter(selectedRecipe => selectedRecipe.name === recipe.name)
@@ -202,6 +212,14 @@ export default {
 
             this.selectedEntries[newIndex] = this.draggingItem
             this.selectedEntries[oldIndex] = item
+        },
+        async deleteRecipe (recipe) {
+            try {
+                await fetch('/rest/recipes/' + recipe.id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
+            } catch (error) {
+                console.log('Error: ', error)
+            }
+            this.getRecipeList()
         },
     },
 }

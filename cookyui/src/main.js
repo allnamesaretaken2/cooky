@@ -3,6 +3,7 @@ import App from './App.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from './routes'
 import 'font-awesome/css/font-awesome.css'
+import ModalYesCancel from './components/ModalYesCancel.vue'
 
 /**
  * @param {String} url
@@ -41,6 +42,8 @@ app.config.errorHandler = (err, instance, info) => {
 
     // Add code for UI notifications, reporting or other error handling logic
 }
+
+app.component('ModalYesCancel', ModalYesCancel)
 
 app.use(router)
 const appmount = app.mount('#app')
