@@ -6,7 +6,6 @@ import de.cooky.service.SelectedEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.LinkedHashMap;
 import java.util.Set;
 
 @RestController
@@ -22,7 +21,7 @@ public class SelectedEntryController {
     @GetMapping
     public Set<SelectedEntry> getAll(){
 
-        return selectedEntryRepo.getAllByOrderBySortOrder();
+        return selectedEntryService.getAll();
     }
 
     @DeleteMapping
@@ -30,10 +29,20 @@ public class SelectedEntryController {
         selectedEntryRepo.deleteAll();
     }
 
-    @PutMapping("/select")
-    public void select(@RequestBody LinkedHashMap<String, Boolean> selectionSettings) {
+    @PostMapping("/{idRecipe}")
+    public void create(@PathVariable("idRecipe") Long idRecipe) {
+        selectedEntryService.addSelectionForRecipe(idRecipe);
+    }
 
-        selectedEntryService.setSelection(selectionSettings);
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        selectedEntryRepo.deleteById(id);
+    }
+
+    @PutMapping("/setorder")
+    public void setorder(@RequestBody Long[] entryIds) {
+
+        selectedEntryService.setOrder(entryIds);
     }
 
     @PutMapping("/setComment/{id}")

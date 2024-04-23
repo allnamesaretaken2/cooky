@@ -57,7 +57,7 @@
                             <tr class="form-row">
                                 <td class="col-3"/>
                                 <td class="col-7">
-                                    <textarea class="form-control" :id="'recipePartTextfield' + recipePartIndex" />
+                                    <textarea class="form-control" :id="'recipePartTextfield' + recipePartIndex" rows="5" />
                                 </td>
                                 <td class="col-2 text-right">
                                     <button class="btn btn-secondary fa fa-plus form-control" @click="addIngredient(recipePart, 'recipePartTextfield' + recipePartIndex)" />
@@ -109,15 +109,15 @@ export default {
             return this.recipe.recipeParts && this.recipe.recipeParts.length > 0
         },
     },
-    props: ['recipeName'],
+    props: ['idRecipe'],
     mounted () {
         this.getRecipe()
         this.getIngredients()
     },
     methods: {
         async getRecipe () {
-            if (this.recipeName) {
-                const response = await window.cookyFetch('/rest/recipes/' + this.recipeName, 'GET')
+            if (this.idRecipe) {
+                const response = await window.cookyFetch('/rest/recipes/' + this.idRecipe, 'GET')
                 const json = await response.json()
                 this.recipe = json
             } else {

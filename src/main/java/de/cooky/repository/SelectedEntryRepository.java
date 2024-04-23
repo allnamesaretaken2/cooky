@@ -8,4 +8,6 @@ import java.util.Set;
 public interface SelectedEntryRepository extends JpaRepository<SelectedEntry, Long> {
 
 	Set<SelectedEntry> getAllByOrderBySortOrder();
+
+    SelectedEntry findTopByOrderBySortOrderDesc();
 }

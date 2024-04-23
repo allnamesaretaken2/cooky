@@ -1,19 +1,13 @@
 package de.cooky.rest;
 
-import java.util.List;
-
+import de.cooky.data.ShoppingItem;
+import de.cooky.repository.RecipeToShopRepository;
+import de.cooky.repository.ShoppingItemRepository;
 import de.cooky.service.ShoppingItemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import de.cooky.data.ShoppingItem;
-import de.cooky.repository.ShoppingItemRepository;
+import java.util.List;
 
 @RestController
 @RequestMapping("/rest/shoppinglist")
@@ -23,7 +17,10 @@ public class ShoppingListController {
 	private ShoppingItemRepository shoppingListRepo;
 
 	@Autowired
-	private ShoppingItemService shoopintItemService;
+	private ShoppingItemService shoppingItemService;
+
+	@Autowired
+	private RecipeToShopRepository recipeToShopRepo;
 
 	@GetMapping
 	public List<ShoppingItem> get() {
@@ -31,10 +28,15 @@ public class ShoppingListController {
 		return shoppingListRepo.findAllByOrderByItemOrderAsc();
 	}
 
+	@PutMapping("/enhance")
+	public void enhance(@RequestBody List<Long> recipeIds){
+		shoppingItemService.enhanceShoppingList(recipeIds);
+	}
+
 	@PostMapping
 	public List<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
 
-		return shoopintItemService.updateOrderAndSaveAll(list);
+		return shoppingItemService.updateOrderAndSaveAll(list);
 	}
 	
 	@DeleteMapping("{id}")
@@ -45,5 +47,7 @@ public class ShoppingListController {
 	@DeleteMapping
 	public void delete() {
 		shoppingListRepo.deleteAll();
+		recipeToShopRepo.deleteAll();
+
 	}
 }

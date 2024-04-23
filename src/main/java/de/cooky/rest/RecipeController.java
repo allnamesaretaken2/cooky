@@ -44,12 +44,12 @@ public class RecipeController {
 		return recipeRepo.findBySelected(true);
 	}
 
-	@GetMapping("{recipeName}")
-	public Recipe getOne(@PathVariable String recipeName) {
+	@GetMapping("{idRecipe}")
+	public Recipe getOne(@PathVariable Long idRecipe) {
 
-		Recipe recipe = recipeRepo.findByName(recipeName);
+		Recipe recipe = recipeRepo.findById(idRecipe).orElse(null);
 		if(recipe == null){
-			throw new CookyErrorMsg("Kein Rezept mit Namen " + recipeName + " gefunden");
+			throw new CookyErrorMsg("Kein Rezept mit ID " + idRecipe + " gefunden");
 		}
 		return recipe;
 	}

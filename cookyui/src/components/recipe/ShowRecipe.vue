@@ -72,13 +72,13 @@ export default {
             recipe: {},
         }
     },
-    props: ['recipeName'],
+    props: ['idRecipe'],
     mounted () {
         this.getRecipe()
     },
     methods: {
         async getRecipe () {
-            const response = await window.cookyFetch('/rest/recipes/' + this.recipeName, 'GET')
+            const response = await window.cookyFetch('/rest/recipes/' + this.idRecipe, 'GET')
             const json = await response.json()
             this.recipe = json
         },

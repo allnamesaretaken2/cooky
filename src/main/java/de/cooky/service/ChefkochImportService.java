@@ -137,7 +137,7 @@ public class ChefkochImportService {
 
 			if (StringUtils.isNotEmpty(ingredientName)) {
 
-				Ingredient ingredient = ingredientService.getOrCreateTemporaryIngredient(ingredientName);
+				Ingredient ingredient = ingredientService.getOrCreateTemporaryIngredient(ingredientName.trim());
 				itr.setIngredient(ingredient);
 
 				itrSet.add(itr);

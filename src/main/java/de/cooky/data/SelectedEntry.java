@@ -1,9 +1,6 @@
 package de.cooky.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -18,12 +15,16 @@ public class SelectedEntry {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
 	private String name;
 
 	private String comment;
 
 	private int sortOrder;
+
+	private Long idRecipe;
+
+	@Transient
+	private String frontendText;
 
 	public void setId(Long id) {
 		this.id = id;
@@ -55,5 +56,21 @@ public class SelectedEntry {
 
 	public String getComment() {
 		return comment;
+	}
+
+	public void setIdRecipe(Long idRecipe) {
+		this.idRecipe = idRecipe;
+	}
+
+	public Long getIdRecipe() {
+		return idRecipe;
+	}
+
+	public void setFrontendText(String frontendText) {
+		this.frontendText = frontendText;
+	}
+
+	public String getFrontendText() {
+		return frontendText;
 	}
 }

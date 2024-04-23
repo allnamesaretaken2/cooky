@@ -1,83 +1,91 @@
 package de.cooky.service;
 
+import de.cooky.data.*;
+import de.cooky.repository.RecipeRepository;
+import de.cooky.repository.RecipeToShopRepository;
+import de.cooky.repository.ShoppingItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import de.cooky.data.IngredientToRecipePart;
-import de.cooky.data.ShoppingItem;
-import de.cooky.repository.ShoppingItemRepository;
+import java.util.stream.Collectors;
 
 @Service
 public class ShoppingItemService {
 
 	@Autowired
+	private RecipeRepository recipeRepo;
+
+	@Autowired
 	private ShoppingItemRepository shoppingItemRepo;
+	
+	@Autowired
+	private RecipeToShopRepository recipeToShopRepo;
 
-	public void enhanceShoppingList(List<IngredientToRecipePart> ingredients) {
+	public void enhanceShoppingList(List<Long> recipeIdsAsArray) {
 
-		List<IngredientToRecipePart> tmp = new ArrayList<>(ingredients);
+		List<RecipeToShop> all = recipeToShopRepo.findAll();
+		List<Long> recipesWeAlreadyKnow = all.stream().map(RecipeToShop::getIdRecipe).collect(Collectors.toList());
+
+		List<Long> recipeIds = new ArrayList<>(recipeIdsAsArray);
+
+		//ignore those we already have in our list
+		recipeIds.removeAll(recipesWeAlreadyKnow);
+
+		List<Recipe> recipesToBeCooked = recipeRepo.findAllById(recipeIds);
 
 		Map<String, List<IngredientToRecipePart>> ingredientNames = new HashMap<>();
 
-		for (IngredientToRecipePart itr : ingredients) {
-			List<IngredientToRecipePart> list = ingredientNames.get(itr.getIngredient().getName());
-
-			if (list == null) {
-				list = new ArrayList<>();
-
-				ingredientNames.put(itr.getIngredient().getName(), list);
+		for(Recipe recipe : recipesToBeCooked) {
+			for (RecipePart part : recipe.getRecipeParts()) {
+				for (IngredientToRecipePart itr : part.getIngredients()) {
+                    List<IngredientToRecipePart> list = ingredientNames.computeIfAbsent(itr.getIngredient().getName(), k -> new ArrayList<>());
+                    list.add(itr);
+				}
 			}
-
-			list.add(itr);
 		}
 
 		List<ShoppingItem> items = shoppingItemRepo.findByNameIn(ingredientNames.keySet());
 
-		for (ShoppingItem item : items) {
+		for(Map.Entry<String, List<IngredientToRecipePart>> entry : ingredientNames.entrySet()){
 
-			List<IngredientToRecipePart> list = ingredientNames.get(item.getName());
+			String ingredientName = entry.getKey();
 
-			if (list == null) {
-				continue;
-			}
+			ShoppingItem shoppingItem = getShoppingItemByIngredientName(items, ingredientName);
 
-			for (IngredientToRecipePart itr : list) {
-
-				if (!StringUtils.equals(itr.getUnit(), item.getUnit())) {
-					continue;
-				}
-
-				if(item.getAmount() == null)
+			for (IngredientToRecipePart itrp : entry.getValue()) {
+				if(shoppingItem.getAmount() == null)
 				{
-					item.setAmount(itr.getAmount());
-				}else if(itr.getAmount() != null){
-					item.setAmount(item.getAmount() + itr.getAmount());
+					shoppingItem.setAmount(itrp.getAmount());
+				}else if(itrp.getAmount() != null){
+					shoppingItem.setAmount(shoppingItem.getAmount() + itrp.getAmount());
 				}
-				tmp.remove(itr);
+				shoppingItem.setUnit(itrp.getUnit());
 			}
 		}
 
-		List<ShoppingItem> newItems = new ArrayList<>();
-		for (IngredientToRecipePart newIngredient : tmp) {
-
-			ShoppingItem item = new ShoppingItem();
-			item.setName(newIngredient.getIngredient().getName());
-			item.setUnit(newIngredient.getUnit());
-			item.setAmount(newIngredient.getAmount());
-
-			newItems.add(item);
+		updateOrderAndSaveAll(items);
+		for(Long idRecipe : recipeIds){
+			RecipeToShop shop = new RecipeToShop();
+			shop.setIdRecipe(idRecipe);
+			recipeToShopRepo.save(shop);
 		}
-
-		shoppingItemRepo.saveAll(newItems);
 	}
 
-    public List<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
+	private static ShoppingItem getShoppingItemByIngredientName(List<ShoppingItem> items, String ingredientName) {
+		ShoppingItem shoppingItem = items.stream().filter(item -> item.getName().equals(ingredientName)).findFirst().orElse(null);
+		if(shoppingItem == null){
+			shoppingItem = new ShoppingItem();
+			shoppingItem.setName(ingredientName);
+			items.add(shoppingItem);
+		}
+		return shoppingItem;
+	}
+
+	public List<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
 
 		int order = 0;
 		for (ShoppingItem shoppingItem : list) {
@@ -85,6 +93,5 @@ public class ShoppingItemService {
 		}
 
 		return shoppingItemRepo.saveAll(list);
-
     }
 }

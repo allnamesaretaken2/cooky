@@ -19,14 +19,14 @@
                 </thead>
                 <tbody>
                     <tr v-for="(recipe,key) in recipes" :key="key">
-                        <td @click="openRecipe(recipe.name)">
+                        <td @click="openRecipe(recipe.id)">
                             <h5>{{ recipe.name }}</h5>
                         </td>
-                        <td @click="openRecipe(recipe.name)">
+                        <td @click="openRecipe(recipe.id)">
                             <h5>{{recipe.durationInMinutes }}</h5>
                         </td>
-                        <td class="text-right" style="width: 120px;">
-                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-2" @click="setSelection(recipe, true)"
+                        <td class="text-right" style="width: 110px;">
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-1" @click="setSelection(recipe)"
                                     data-mdb-tooltip-init title="Zum kochen auswählen" />
                             <button type="button" class="btn btn-secondary fa fa-trash" @click="openDeleteRecipePopup(recipe)"
                                     data-mdb-tooltip-init title="weg damit" />
@@ -55,18 +55,19 @@
 
             <table class="table table-hover">
                 <thead style="background-color:#AFBC6C">
-                    <th class="py-2">Name</th><th />
+                    <th class="py-2">Name</th>
+                    <th class="py-2">Actions</th>
                 </thead>
                 <tbody>
-                    <tr v-for="(recipe,key) in selectedEntries" :key="key" :class="{'selected':recipe.temporarySelected === true, 'unselected':recipe.temporarySelected === false}"
-                        draggable="true" @drop="finishDrag" @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
-                        <td @click="openRecipe(recipe.name)">
-                            <h5>{{ recipe.name }}</h5>
+                    <tr v-for="(recipe,key) in selectedEntries" :key="key" draggable="true" @dragend="finishDrag"
+                        @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
+                        <td @click="openRecipe(recipe.idRecipe)">
+                            <h5>{{ recipe.frontendText }}</h5>
                             <span v-if="recipe.comment" class="commentColor">{{recipe.comment}}</span>
                         </td>
-                        <td class="text-right">
-                            <button type="button" class="btn btn-secondary fa fa-pencil-square-o" @click="setComment(recipe)" />
-                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="setSelection(recipe, false)" />
+                        <td class="text-right" style="width: 110px">
+                            <button type="button" class="btn btn-secondary fa fa-pencil-square-o mr-1" @click="setComment(recipe)" />
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="deleteSelection(recipe)" />
                         </td>
                     </tr>
                 </tbody>
@@ -79,7 +80,7 @@
                 </div>
             </div>
 
-            <button type="button" class="btn btn-secondary" @click="addToShoppingList()">speichern und Zutaten in EK-Liste übernehmen</button>
+            <button type="button" class="btn btn-secondary" @click="addToShoppingList()">Zutaten in EK-Liste übernehmen</button>
         </div>
     </div>
 
@@ -143,8 +144,8 @@ export default {
             this.showLoadingSpinnerSelected = false
         },
 
-        openRecipe (recipeName) {
-            this.$router.push('/recipe?name=' + recipeName + '&editMode=false')
+        openRecipe (id) {
+            this.$router.push('/recipe?idRecipe=' + id + '&editMode=false')
         },
         addRecipe () {
             this.$router.push('/recipe/?editMode=true')
@@ -167,44 +168,31 @@ export default {
             }
             this.$refs.modalYesCancel.show(callback, 'Auswahl abräumen', 'Alles neu?')
         },
-        setSelection (recipe, select) {
-            const alreadySelected = this.selectedEntries.filter(selectedRecipe => selectedRecipe.name === recipe.name)
 
-            if (recipe.temporarySelected === true && select === false) {
-                const idx = this.selectedEntries.indexOf(recipe)
-                this.selectedEntries.pop(idx)
-            }
-
-            recipe.temporarySelected = select
-
-            if (select === false) {
-                this.$forceUpdate()
-            }
-
-            if (select && alreadySelected.length === 0) {
-                // only add the recipe if it wasn't already added
-                this.selectedEntries.push(recipe)
-            }
+        async deleteSelection (entry, select) {
+            await window.cookyFetch('/rest/selectedentry/' + entry.id, 'DELETE')
+            this.getSelectedEntries()
+        },
+        async setSelection (recipe) {
+            await window.cookyFetch('/rest/selectedentry/' + recipe.id, 'POST')
+            this.getSelectedEntries()
         },
 
         async saveTemporarySelection () {
             this.showLoadingSpinnerSelected = true
 
-            const body = {}
+            const body = []
+            this.selectedEntries.forEach(entry => { body.push(entry.id) })
 
-            this.selectedEntries.forEach(recipe => { body[recipe.name] = recipe.temporarySelected === undefined ? null : recipe.temporarySelected })
+            await window.cookyFetch('/rest/selectedentry/setorder', 'PUT', JSON.stringify(body))
 
-            const response = await window.cookyFetch('/rest/selectedentry/select/', 'PUT', JSON.stringify(body))
-
-            if (response.ok) {
-                this.getSelectedEntries()
-            } else {
-                this.showLoadingSpinnerSelected = false
-            }
+            this.showLoadingSpinnerSelected = false
         },
 
         async addToShoppingList () {
-            await this.saveTemporarySelection()
+            const recipeIds = []
+            this.selectedEntries.forEach(entry => { if (entry.idRecipe) { recipeIds.push(entry.idRecipe) } })
+            await window.cookyFetch('/rest/shoppinglist/enhance', 'PUT', JSON.stringify(recipeIds))
         },
 
         startDrag (item) {
@@ -212,6 +200,7 @@ export default {
         },
         finishDrag () {
             this.draggingItem = null
+            this.saveTemporarySelection()
         },
         changeOrder (item) {
             const newIndex = this.selectedEntries.indexOf(item)
