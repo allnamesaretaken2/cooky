@@ -73,9 +73,9 @@ public class SelectedEntryService {
 				Recipe recipe = recipeRepo.findById(entry.getIdRecipe()).orElse(null);
 				if(recipe != null){
 					entry.setFrontendText(recipe.getName());
-				}else{
-					entry.setFrontendText(entry.getName());
 				}
+			}else{
+				entry.setFrontendText(entry.getName());
 			}
 		});
 

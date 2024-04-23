@@ -5,7 +5,14 @@
                 <button type="button" class="btn btn-secondary m-1" @click="addNewItem()">Hinzufügen</button>
             </div>
         </div>
-
+        <div class="row">
+            We added the ingredients of the following recipes:
+        </div>
+        <div class="row">
+            <ul>
+                <li v-for="(recipeName, key) in recipeNames" :key="key" >{{ recipeName }}</li>
+            </ul>
+        </div>
         <table class="table table-hover">
             <thead style="background-color:#AFBC6C">
                 <th class="py-2">Name</th>
@@ -70,7 +77,7 @@ export default {
     data () {
         return {
             items: [],
-            recipes: [],
+            recipeNames: [],
             draggingItem: null,
             // the item that is currently edited in the edit-popup
             itemEdit: null,
@@ -79,6 +86,7 @@ export default {
 
     mounted: function () {
         this.getShoppingItems()
+        this.getRecipeNamesWeAlreadyAddedToTheShoppingList()
     },
 
     methods: {
@@ -126,6 +134,7 @@ export default {
         async clearList () {
             await window.cookyFetch('/rest/shoppinglist/', 'DELETE')
             this.items = []
+            this.recipeNames = []
         },
 
         addNewItem () {
@@ -192,15 +201,16 @@ export default {
         },
 
         async getShoppingItems () {
-            try {
-                const response = await fetch('/rest/shoppinglist', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const response = await window.cookyFetch('/rest/shoppinglist', 'GET')
+            const json = await response.json()
 
-                const json = await response.json()
+            this.items = json
+        },
+        async getRecipeNamesWeAlreadyAddedToTheShoppingList () {
+            const response = await window.cookyFetch('/rest/shoppinglist/getRecipeNamesWeAlreadyAddedToTheShoppingList', 'GET')
+            const json = await response.json()
 
-                this.items = json
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            this.recipeNames = json
         },
     },
 }

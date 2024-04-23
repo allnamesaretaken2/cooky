@@ -1,6 +1,9 @@
 package de.cooky.rest;
 
+import de.cooky.data.Recipe;
+import de.cooky.data.RecipeToShop;
 import de.cooky.data.ShoppingItem;
+import de.cooky.repository.RecipeRepository;
 import de.cooky.repository.RecipeToShopRepository;
 import de.cooky.repository.ShoppingItemRepository;
 import de.cooky.service.ShoppingItemService;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rest/shoppinglist")
@@ -21,6 +25,9 @@ public class ShoppingListController {
 
 	@Autowired
 	private RecipeToShopRepository recipeToShopRepo;
+
+	@Autowired
+	private RecipeRepository recipeRepo;
 
 	@GetMapping
 	public List<ShoppingItem> get() {
@@ -48,6 +55,12 @@ public class ShoppingListController {
 	public void delete() {
 		shoppingListRepo.deleteAll();
 		recipeToShopRepo.deleteAll();
+	}
 
+	@GetMapping("/getRecipeNamesWeAlreadyAddedToTheShoppingList")
+	public List<String> getRecipeNamesWeAlreadyAddedToTheShoppingList(){
+		List<Long> recipeIds = recipeToShopRepo.findAll().stream().map(RecipeToShop::getIdRecipe).collect(Collectors.toList());
+
+		return recipeRepo.findAllById(recipeIds).stream().map(Recipe::getName).collect(Collectors.toList());
 	}
 }

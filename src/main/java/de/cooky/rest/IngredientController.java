@@ -6,10 +6,12 @@ import de.cooky.data.Recipe;
 import de.cooky.data.RecipePart;
 import de.cooky.repository.IngredientRepository;
 import de.cooky.repository.RecipeRepository;
-import de.cooky.service.RecipeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -41,6 +43,6 @@ public class IngredientController {
 
     @GetMapping
     public List<Ingredient> get(){
-        return ingredientRepo.findAll();
+        return ingredientRepo.findAll(Sort.by(Sort.Order.asc("name")));
     }
 }
