@@ -1,52 +1,6 @@
 <template>
     <div class="row">
         <div class="col-12 col-md-6">
-
-            <h4 class="mt-2">Rezepte</h4>
-
-            <div>
-                <input v-model="searchText" type="text" class="col-4">
-                <button class="btn btn-secondary " @click="getRecipeList()">Suchen</button>
-                <button type="button" class="btn btn-secondary" @click="addRecipe()">Hinzufügen</button>
-                <button type="button" class="btn btn-secondary" @click="openImportModal()">Importieren</button>
-            </div>
-
-            <table class="table table-hover">
-                <thead style="background-color:#AFBC6C">
-                    <th class="py-2">Name</th>
-                    <th class="py-2">Min.</th>
-                    <th class="py-2">Actions</th>
-                </thead>
-                <tbody>
-                    <tr v-for="(recipe,key) in recipes" :key="key">
-                        <td @click="openRecipe(recipe.id)">
-                            <h5>{{ recipe.name }}</h5>
-                        </td>
-                        <td @click="openRecipe(recipe.id)">
-                            <h5>{{recipe.durationInMinutes }}</h5>
-                        </td>
-                        <td class="text-right" style="width: 110px;">
-                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right mr-1" @click="setSelection(recipe)"
-                                    data-mdb-tooltip-init title="Zum kochen auswählen" />
-                            <button type="button" class="btn btn-secondary fa fa-trash" @click="openDeleteRecipePopup(recipe)"
-                                    data-mdb-tooltip-init title="weg damit" />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div v-show="showLoadingSpinner" class="row mt-4">
-                <div class="spinner-border mx-auto" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
-
-            <modal-import-recipe ref="modalImportRecipe" :callback="getRecipeList" />
-            <modal-yes-cancel ref="modalYesCancel" />
-        </div>
-
-        <div class="col-12 col-md-6">
-
             <h4 class="mt-2">Das wollen wir demnächst kochen</h4>
 
             <div>
@@ -67,7 +21,7 @@
                         </td>
                         <td class="text-right" style="width: 110px">
                             <button type="button" class="btn btn-secondary fa fa-pencil-square-o mr-1" @click="setComment(recipe)" />
-                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-left" @click="deleteSelection(recipe)" />
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-right" @click="deleteSelection(recipe)" />
                         </td>
                     </tr>
                 </tbody>
@@ -81,6 +35,51 @@
             </div>
 
             <button type="button" class="btn btn-secondary" @click="addToShoppingList()">Zutaten in EK-Liste übernehmen</button>
+        </div>
+
+        <div class="col-12 col-md-6">
+
+            <h4 class="mt-2">Rezepte</h4>
+
+            <div>
+                <input v-model="searchText" type="text" class="col-4">
+                <button class="btn btn-secondary " @click="getRecipeList()">Suchen</button>
+                <button type="button" class="btn btn-secondary" @click="addRecipe()">Hinzufügen</button>
+                <button type="button" class="btn btn-secondary" @click="openImportModal()">Importieren</button>
+            </div>
+
+            <table class="table table-hover">
+                <thead style="background-color:#AFBC6C">
+                    <th class="py-2">Name</th>
+                    <th class="py-2">Min.</th>
+                    <th class="py-2">Actions</th>
+                </thead>
+                <tbody>
+                    <tr v-for="(recipe,key) in filteredRecipes" :key="key" >
+                        <td @click="openRecipe(recipe.id)" v-if="textContains(recipe, searchText)">
+                            <h5>{{ recipe.name }}</h5>
+                        </td>
+                        <td @click="openRecipe(recipe.id)">
+                            <h5>{{recipe.durationInMinutes }}</h5>
+                        </td>
+                        <td class="text-right" style="width: 110px;">
+                            <button type="button" class="btn btn-secondary fa fa-arrow-circle-left mr-1" @click="setSelection(recipe)"
+                                    data-mdb-tooltip-init title="Zum kochen auswählen" />
+                            <button type="button" class="btn btn-secondary fa fa-trash" @click="openDeleteRecipePopup(recipe)"
+                                    data-mdb-tooltip-init title="weg damit" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div v-show="showLoadingSpinner" class="row mt-4">
+                <div class="spinner-border mx-auto" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+
+            <modal-import-recipe ref="modalImportRecipe" :callback="getRecipeList" />
+            <modal-yes-cancel ref="modalYesCancel" />
         </div>
     </div>
 
@@ -110,6 +109,19 @@ export default {
         this.getRecipeList()
         this.getSelectedEntries()
     },
+    computed: {
+        filteredRecipes: function () {
+            if (!this.searchText) {
+                return this.recipes
+            }
+
+            const filterText = this.searchText.toLowerCase()
+
+            return this.recipes.filter(recipe => {
+                return recipe.name.toLowerCase().indexOf(filterText) !== -1
+            })
+        },
+    },
     methods: {
         async getRecipeList () {
             this.recipes = []
@@ -133,13 +145,9 @@ export default {
 
             this.showLoadingSpinnerSelected = true
 
-            try {
-                const response = await window.cookyFetch('/rest/selectedentry', 'GET')
-                const json = await response.json()
-                this.selectedEntries = json
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            const response = await window.cookyFetch('/rest/selectedentry', 'GET')
+            const json = await response.json()
+            this.selectedEntries = json
 
             this.showLoadingSpinnerSelected = false
         },
@@ -221,8 +229,13 @@ export default {
             const callback = (newComment) => {
                 selectedEntry.comment = newComment
             }
-
             this.$refs.changeCommentModal.show(selectedEntry, callback)
+        },
+        textContains (recipe, filterText) {
+            if (!filterText) {
+                return true
+            }
+            return recipe.name.toLowerCase().indexOf(filterText.toLowerCase()) !== -1
         },
     },
 }
