@@ -42,7 +42,7 @@ export default {
             this.$refs.baseModal.close()
         },
         async chefkoch () {
-            const response = await fetch('/rest/recipes/importFromChefkoch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.chefkochImport) })
+            const response = await window.cookyFetch('/rest/recipes/importFromChefkoch', 'POST', JSON.stringify(this.chefkochImport))
             const json = await response.json()
             this.callback(json)
             this.$refs.baseModal.close()

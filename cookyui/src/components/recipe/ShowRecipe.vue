@@ -40,7 +40,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="col-6 col-sm-8 col-xl-7">{{recipePart.description}}</div>
+                <div class="col-6 col-sm-8 col-xl-7" style="white-space: pre-line;">{{recipePart.description}}</div>
             </div>
         </div>
         <div class="row">

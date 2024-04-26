@@ -49,9 +49,8 @@ public class ChefkochImportService {
 
 			Recipe recipe = createTemporaryRecipeWithOneRecipePart(doc, url);
 
-			Set<IngredientToRecipePart> itrSet = createTemporaryIngredients(doc);
-
-			recipe.getRecipeParts().iterator().next().setIngredients(itrSet);
+			Set<RecipePart> recipeParts = createRecipeParts(doc);
+			recipe.setRecipeParts(recipeParts);
 
 			LOG.info("finished import of recipe from url " + url);
 
@@ -60,65 +59,71 @@ public class ChefkochImportService {
 			return recipe;
 
 		} catch (IOException e) {
-
 			LOG.error("import from url " + url + " failed. Reason:");
 			
 			throw new CookyErrorMsg(e);
 		}
-
 	}
 
-	private Set<IngredientToRecipePart> createTemporaryIngredients(Document doc) {
-		Elements ingredientTable = doc.getElementsByAttributeValue("class", "ingredients table-header");
+	private Set<RecipePart> createRecipeParts(Document doc) {
+		Elements ingredientTables = doc.getElementsByAttributeValue("class", "ingredients table-header");
 
-		if (ingredientTable.isEmpty()) {
+		if (ingredientTables.isEmpty()) {
 			throw new CookyErrorMsg("expected at least one element with 'ingredients'");
 		}
 
-		if (ingredientTable.size() > 1) {
-			throw new CookyErrorMsg(
-					"expected only one element with 'ingredients'. But there are " + ingredientTable.size());
+		Set<RecipePart> recipePart = new LinkedHashSet<>();
+
+		for(Element ingredientTable : ingredientTables){
+			RecipePart part = new RecipePart();
+			recipePart.add(part);
+
+			Elements titleHeader = ingredientTable.getElementsByTag("thead");
+			if(!titleHeader.isEmpty()){
+				Elements headerText = titleHeader.first().getElementsByTag("h3");
+				part.setName(headerText.text());
+			}
+
+			Elements rowList = ingredientTable.getElementsByTag("tbody").first().getElementsByTag("tr");
+			createIngredientsForThisRecipePart(part, rowList);
 		}
+		return recipePart;
+	}
 
-		Element table = ingredientTable.first();
-
-		Elements rowList = table.getElementsByTag("tr");
-
+	private void createIngredientsForThisRecipePart(RecipePart part, Elements rowList) {
 		Set<IngredientToRecipePart> itrSet = new LinkedHashSet<>();
+		part.setIngredients(itrSet);
 
 		rowList.forEach(row -> {
-
 			IngredientToRecipePart itr = new IngredientToRecipePart();
 
 			Element amount = row.getElementsByTag("td").first();
 			String amountText = amount.text();
 			amountText = amountText.replace(((char) 160) + "", " ");
-			
+
 			try {
-			
-			String[] amountSplitted = amountText.trim().split(" ");
+				String[] amountSplitted = amountText.trim().split(" ");
 
-			if (amountSplitted.length == 1) {
+				if (amountSplitted.length == 1) {
 
-				String value = amountSplitted[0];
+					String value = amountSplitted[0];
 
-				boolean isNumber = NumberUtils.isCreatable(value);
+					boolean isNumber = NumberUtils.isCreatable(value);
 
-				if (isNumber) {
-					itr.setAmount(Float.parseFloat(value));
+					if (isNumber) {
+						itr.setAmount(Float.parseFloat(value));
+					} else {
+						itr.setUnit(value);
+					}
+				} else if (amountSplitted.length == 2) {
+
+					itr.setAmount(Float.parseFloat(amountSplitted[0]));
+					itr.setUnit(amountSplitted[1]);
+
 				} else {
-					itr.setUnit(value);
+					// TODO append warning: kann zutat nicht auslesen
 				}
-			} else if (amountSplitted.length == 2) {
-
-				itr.setAmount(Float.parseFloat(amountSplitted[0]));
-				itr.setUnit(amountSplitted[1]);
-
-			} else {
-				// TODO append warning: kann zutat nicht auslesen
-			}
 			}catch (RuntimeException e) {
-
 				//TODO: use logger
 				itr.setAmount(null);
 				itr.setUnit(amountText);
@@ -136,16 +141,12 @@ public class ChefkochImportService {
 			}
 
 			if (StringUtils.isNotEmpty(ingredientName)) {
-
 				Ingredient ingredient = ingredientService.getOrCreateTemporaryIngredient(ingredientName.trim());
 				itr.setIngredient(ingredient);
 
 				itrSet.add(itr);
 			}
-
 		});
-
-		return itrSet;
 	}
 
 	private Recipe createTemporaryRecipeWithOneRecipePart(Document doc, String url) {
@@ -212,10 +213,6 @@ public class ChefkochImportService {
 		recipe.setDescription(builder.toString());
 		recipe.setPersons(Integer.parseInt(portions.first().attr("value")));
 
-		RecipePart part = new RecipePart();
-		recipe.getRecipeParts().add(part);
-
 		return recipe;
 	}
-
 }

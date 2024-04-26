@@ -3,9 +3,9 @@
         <h1 class="text-right mt-3" style="color:#005B4C">cooky</h1>
         <div class="row border-top border-bottom py-2" style="border-color:#005B4C !important;">
             <div class="col">
-                <div class="row py-2" style="background-color:#005B4C; color:#FBFAF0;">
-                    <div class="col-1"><router-link to="/" class="badge badge-secondary">Alle Rezepte</router-link></div>
-                    <div class="col-1"><router-link to="/shoppinglist" class="badge badge-secondary">Einkaufsliste</router-link></div>
+                <div class="nav py-2" style="background-color:#005B4C; color:#FBFAF0;">
+                    <router-link to="/" class="mx-1 px-1 nav-item-style">Alle Rezepte</router-link>
+                    <router-link to="/shoppinglist" class="mx-1 px-1 nav-item-style" >Einkaufsliste</router-link>
                 </div>
             </div>
         </div> <!-- header -->
@@ -46,5 +46,16 @@ body {background-color:#FBFAF0}
     position: fixed;
     margin : auto;
     top: 0;
+}
+
+a.nav-item-style:hover {
+    color: rgb(175, 188, 108);
+}
+.nav-item-style {
+    color: #FBFAF0;
+    font-size: 20px;
+    /* border: solid; */
+    /* border-width: 1px; */
+    background-color: #aaaaaa44;
 }
 </style>
