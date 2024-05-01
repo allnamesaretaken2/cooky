@@ -1,7 +1,7 @@
 <template>
     <div>
-        <template v-if="editMode"><EditRecipe :idRecipe="idRecipe" @toggleEditMode="toggleEditMode()"/></template>
-        <template v-else><ShowRecipe :idRecipe="idRecipe" @toggleEditMode="toggleEditMode()"/></template>
+        <template v-if="editMode"><EditRecipe :idRecipe="idRecipe" @toggleEditMode="toggleEditMode"/></template>
+        <template v-else><ShowRecipe :idRecipe="idRecipe" @toggleEditMode="toggleEditMode"/></template>
     </div>
 </template>
 
@@ -25,7 +25,10 @@ export default {
         }
     },
     methods: {
-        toggleEditMode () {
+        toggleEditMode (idRecipe) {
+            if (idRecipe) {
+                this.idRecipe = idRecipe
+            }
             this.editMode = !this.editMode
         },
     },

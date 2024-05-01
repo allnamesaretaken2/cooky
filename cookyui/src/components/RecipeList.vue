@@ -44,8 +44,6 @@
             <div>
                 <input v-model="searchText" type="text" class="col-4">
                 <button class="btn btn-secondary " @click="getRecipeList()">Suchen</button>
-                <button type="button" class="btn btn-secondary" @click="addRecipe()">Hinzufügen</button>
-                <button type="button" class="btn btn-secondary" @click="openImportModal()">Importieren</button>
             </div>
 
             <table class="table table-hover">
@@ -78,7 +76,6 @@
                 </div>
             </div>
 
-            <modal-import-recipe ref="modalImportRecipe" :callback="getRecipeList" />
             <modal-yes-cancel ref="modalYesCancel" />
         </div>
     </div>
@@ -86,13 +83,11 @@
 </template>
 
 <script>
-import ModalImportRecipe from './ModalImportRecipe.vue'
 import ModalChangeEntryComment from './ModalChangeEntryComment.vue'
 
 export default {
     name: 'RecipeList',
     components: {
-        ModalImportRecipe,
         ModalChangeEntryComment,
     },
     data: function () {
@@ -154,12 +149,6 @@ export default {
 
         openRecipe (id) {
             this.$router.push('/recipe?idRecipe=' + id + '&editMode=false')
-        },
-        addRecipe () {
-            this.$router.push('/recipe/?editMode=true')
-        },
-        openImportModal () {
-            this.$refs.modalImportRecipe.show()
         },
         openDeleteRecipePopup (recipe) {
             const me = this

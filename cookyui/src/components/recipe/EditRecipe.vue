@@ -5,7 +5,7 @@
                 <input v-model="recipe.name" class="form-control">
             </div>
             <div class="col-2 col-form-group d-flex text-right">
-                <button class="btn btn-secondary fa fa-undo form-control" title="Abbrechen" @click="$emit('toggleEditMode')" />
+                <button class="btn btn-secondary fa fa-undo form-control" title="Abbrechen" @click="returnToReadOrRecipeList" />
                 <button class="btn btn-secondary fa fa-save form-control" title="Rezepte speichern" @click="saveRecipe()" />
             </div>
         </div>
@@ -136,8 +136,9 @@ export default {
                 await window.cookyFetch('/rest/recipes/' + this.recipe.id, 'PUT', JSON.stringify(this.recipe))
                 this.$emit('toggleEditMode')
             } else {
-                await window.cookyFetch('/rest/recipes/', 'POST', JSON.stringify(this.recipe))
-                this.$router.push('/')
+                const response = await window.cookyFetch('/rest/recipes/', 'POST', JSON.stringify(this.recipe))
+                const recipe = await response.json()
+                this.$emit('toggleEditMode', recipe.id)
             }
         },
         addPart (recipePartIndex) {
@@ -156,6 +157,13 @@ export default {
             }
             this.recipe.recipeParts.splice(recipePartIndex + 1, 0, newPart)
             this.addIngredient(newPart)
+        },
+        returnToReadOrRecipeList () {
+            if (this.recipe.id) {
+                this.$emit('toggleEditMode')
+            } else {
+                this.$router.push('/')
+            }
         },
         deletePart (recipePartIndex) {
             this.recipe.recipeParts.splice(recipePartIndex, 1)

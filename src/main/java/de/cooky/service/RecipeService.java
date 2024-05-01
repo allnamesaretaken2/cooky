@@ -4,7 +4,6 @@ import de.cooky.data.Ingredient;
 import de.cooky.data.IngredientToRecipePart;
 import de.cooky.data.Recipe;
 import de.cooky.data.RecipePart;
-import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -43,16 +43,18 @@ public class RecipeService {
 
 			int counter = 0;
 
+			Set<IngredientToRecipePart> ingredientToRecipeParts = part.getIngredients();
+
+			ingredientToRecipeParts.removeIf( itrp-> {
+				//faulty ingredient configs will be removed.
+				//It is faulty if no ingredient was connected to this part or the part was never saved
+				//and is missing an ingredient name
+				return itrp.getIngredient() == null ||
+						(StringUtils.isEmpty(itrp.getIngredient().getName()) && itrp.getId() == null);
+			});
+
 			for (IngredientToRecipePart ingr : part.getIngredients()) {
 				Ingredient ingredient = ingr.getIngredient();
-
-				if (ingredient == null) {
-					throw new CookyErrorMsg("No ingredient found on ingredient_usage-object");
-				}
-
-				if (StringUtils.isEmpty(ingredient.getName())) {
-					throw new CookyErrorMsg("an ingredient has no name");
-				}
 
 				Ingredient ingredientFromDB = ingredientService.getOrCreateIngredient(ingredient.getName());
 				ingr.setIngredient(ingredientFromDB);

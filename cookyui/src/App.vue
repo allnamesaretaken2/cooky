@@ -4,8 +4,10 @@
         <div class="row border-top border-bottom py-2" style="border-color:#005B4C !important;">
             <div class="col">
                 <div class="nav py-2" style="background-color:#005B4C; color:#FBFAF0;">
-                    <router-link to="/" class="mx-1 px-1 nav-item-style">Alle Rezepte</router-link>
+                    <router-link to="/" class="mx-1 px-1 nav-item-style">Rezepte</router-link>
                     <router-link to="/shoppinglist" class="mx-1 px-1 nav-item-style" >Einkaufsliste</router-link>
+                    <a class="mx-1 px-1 nav-item-style" @click="openImportModal()">Import</a>
+                    <a class="mx-1 px-1 nav-item-style" @click="addRecipe()">Neu</a>
                 </div>
             </div>
         </div> <!-- header -->
@@ -18,12 +20,18 @@
                 </button>
             </div>
         </div>
+        <modal-import-recipe ref="modalImportRecipe" :callback="openRecipeInEditMode" />
     </div>
 </template>
 
 <script>
+import ModalImportRecipe from './components/ModalImportRecipe.vue'
+
 export default {
     name: 'App',
+    components: {
+        ModalImportRecipe,
+    },
     data () {
         return {
             cookyNotifications: [],
@@ -32,6 +40,15 @@ export default {
     methods: {
         removeNotification (notification, key) {
             this.cookyNotifications.pop(notification)
+        },
+        openImportModal () {
+            this.$refs.modalImportRecipe.show()
+        },
+        openRecipeInEditMode (recipe) {
+            this.$router.push('/recipe?idRecipe=' + recipe.id + '&editMode=true')
+        },
+        addRecipe () {
+            this.$router.push('/recipe/?editMode=true')
         },
     },
 }
