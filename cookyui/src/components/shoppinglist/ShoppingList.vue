@@ -6,7 +6,9 @@
             </div>
         </div>
         <div class="row">
-            We added the ingredients of the following recipes:
+            <div class="col">
+                We added the ingredients of the following recipes:
+            </div>
         </div>
         <div class="row">
             <ul>
@@ -16,25 +18,37 @@
         <table class="table table-hover">
             <thead style="background-color:#AFBC6C">
                 <th class="py-2">Name</th>
-                <th class="py-2">Menge</th>
-                <th class="py-2">Einheit</th>
-                <th />
+                <th class="py-2" width="80px">Menge</th>
+                <th class="py-2" width="100px">Einheit</th>
+                <th width="110px" />
             </thead>
             <tbody>
-                <tr v-for="(item,key) in items" :key="key" draggable="true" @drop="finishDrag" @dragenter="changeOrder(item)" @dragstart="startDrag(item, key)">
-                    <td><input v-model="item.name" type="text"></td>
-                    <td><input v-model="item.amount" type="number"></td>
-                    <td><input v-model="item.unit" type="text"></td>
-                    <td><button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" /></td>
+                <tr v-for="(item,key) in items" :key="key" draggable="true"
+                    @drop="finishDrag" @dragenter="changeOrder(item)" @dragstart="startDrag(item, key)">
+                    <td class="p-2" ref="shoppingItemName" @click="changeEditMode(item, key, 'Name')">
+                        <input v-if="item.isEditable" v-model="item.name" type="text" style="width: 100%;">
+                        <div v-else>{{item.name}}</div>
+                    </td>
+                    <td class="p-2" ref="shoppingItemAmount" @click="changeEditMode(item, key, 'Amount')">
+                        <input v-if="item.isEditable" v-model="item.amount" type="number" style="width: 100%;">
+                        <div v-else>{{item.amount}}</div>
+                    </td>
+                    <td class="p-2" ref="shoppingItemUnit" @click="changeEditMode(item, key, 'Unit')">
+                        <input v-if="item.isEditable" v-model="item.unit" type="text" style="width: 100%;">
+                        <div v-else>{{item.unit}}</div>
+                    </td>
+                    <td class="p-2 " >
+                        <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditMode(item)" />
+                        <button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" />
+                    </td>
                 </tr>
             </tbody>
         </table>
-
         <div class="row">
             <div class="col-12 text-right">
                 <button type="button" class="btn btn-secondary m-1" @click="clearList()">Alles neu</button>
-                <button type="button" class="btn btn-secondary m-1" @click="saveList()">Liste speichern</button>
-                <button type="button" class="btn btn-secondary" @click="copyList()">Liste kopieren</button>
+                <button type="button" class="btn btn-secondary m-1" @click="saveList()">Speichern</button>
+                <button type="button" class="btn btn-secondary" @click="copyList()">Kopieren</button>
             </div>
         </div>
 
@@ -81,6 +95,7 @@ export default {
             draggingItem: null,
             // the item that is currently edited in the edit-popup
             itemEdit: null,
+            previousEditedItem: null,
         }
     },
 
@@ -90,6 +105,21 @@ export default {
     },
 
     methods: {
+        removeEditMode (shoppingItem) {
+            shoppingItem.isEditable = false
+        },
+
+        changeEditMode (shoppingItem, key, refKey) {
+            if (this.previousEditedItem) {
+                this.previousEditedItem.isEditable = false
+            }
+            shoppingItem.isEditable = true
+            this.previousEditedItem = shoppingItem
+
+            this.$nextTick(() => {
+                this.$refs['shoppingItem' + refKey][key].getElementsByTagName('input')[0].focus()
+            })
+        },
 
         /*
          * copy the item list to the clipboard by creating a string representation and stuff that one into an hidden text area.
@@ -136,7 +166,6 @@ export default {
             this.items = []
             this.recipeNames = []
         },
-
         addNewItem () {
             this.itemEdit = {
                 name: null,
@@ -146,11 +175,9 @@ export default {
 
             this.$refs.modalItemEdit.show()
         },
-
         cancelModalItemEdit () {
             this.$refs.modalItemEdit.close()
         },
-
         closeModalItemEdit () {
             this.$refs.modalItemEdit.close()
 
@@ -161,7 +188,6 @@ export default {
                 this.items.push(this.itemEdit)
             }
         },
-
         async removeItem (item, key) {
             if (item.id) {
                 try {
@@ -199,7 +225,6 @@ export default {
                 console.log('Error: ', error)
             }
         },
-
         async getShoppingItems () {
             const response = await window.cookyFetch('/rest/shoppinglist', 'GET')
             const json = await response.json()
