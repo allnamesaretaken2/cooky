@@ -34,11 +34,10 @@ const router = createRouter({
 
 // Global error handler
 app.config.errorHandler = (err, instance, info) => {
+    appmount.addError(err)
     console.error('Global error:', err)
     console.log('Vue instance:', instance)
     console.log('Error info:', info)
-
-    appmount.cookyNotifications.push(err)
 
     // Add code for UI notifications, reporting or other error handling logic
 }

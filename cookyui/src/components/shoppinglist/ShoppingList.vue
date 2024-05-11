@@ -24,8 +24,8 @@
                 <th width="110px" />
             </thead>
             <tbody>
-                <tr v-for="(item,key) in items" :key="key" draggable="true" @mousemove="blorp"
-                    @drop="finishDrag" @dragenter="changeOrder(item)" @dragstart="startDrag(item, key)">
+                <tr v-for="(item,key) in items" :key="key" draggable="true" @mousemove="blorp" @dragend="finishDrag"
+                    @dragenter="changeOrder(item)" @dragstart="startDrag(item)">
                     <td class="p-2" ref="shoppingItemName" @click="changeEditMode(item, key, 'Name')">
                         <input v-if="item.isEditable" v-model="item.name" type="text" style="width: 100%;" @keypress="onEnterKey(item, $event)">
                         <div v-else>{{item.name}}</div>
@@ -73,6 +73,9 @@ export default {
     },
 
     methods: {
+        finishDrag () {
+            this.saveList()
+        },
         blorp (event) {
             var rect = event.currentTarget.getBoundingClientRect()
             const hugosStyle = this.$refs.hugo.style
@@ -200,11 +203,8 @@ export default {
                 this.items.splice(key, 1)
             }
         },
-        startDrag (item, key) {
+        startDrag (item) {
             this.draggingItem = item
-        },
-        finishDrag () {
-            this.draggingItem = null
         },
         changeOrder (item) {
             const newIndex = this.items.indexOf(item)
@@ -214,15 +214,10 @@ export default {
             this.items[oldIndex] = item
         },
         async saveList () {
-            try {
-                const response = await fetch('/rest/shoppinglist/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(this.items) })
-
-                const json = await response.json()
-
-                this.items = json
-            } catch (error) {
-                console.log('Error: ', error)
-            }
+            const response = await window.cookyFetch('/rest/shoppinglist/', 'POST', JSON.stringify(this.items))
+            const json = await response.json()
+            this.items = json.entities
+            this.$root.addOkay('gespeichert in ' + json.duration + ' ms')
         },
         async getShoppingItems () {
             const response = await window.cookyFetch('/rest/shoppinglist', 'GET')
@@ -240,7 +235,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .hugo {
     position: fixed;
     height: 16px;

@@ -2,6 +2,7 @@ package de.cooky.rest;
 
 import de.cooky.data.Recipe;
 import de.cooky.data.RecipeToShop;
+import de.cooky.data.SaveStatistics;
 import de.cooky.data.ShoppingItem;
 import de.cooky.repository.RecipeRepository;
 import de.cooky.repository.RecipeToShopRepository;
@@ -41,7 +42,7 @@ public class ShoppingListController {
 	}
 
 	@PostMapping
-	public List<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
+	public SaveStatistics<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
 
 		return shoppingItemService.updateOrderAndSaveAll(list);
 	}

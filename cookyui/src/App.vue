@@ -13,8 +13,8 @@
         </div> <!-- header -->
         <router-view />
         <div class="cookyAlertContainer">
-            <div v-for="(notification,key) in cookyNotifications" :key="key" class="alert alert-danger alert-dismissible">
-                {{ notification }}
+            <div v-for="(notification,key) in cookyNotifications" :key="key" :class="'alert alert-dismissible ' + notification.class" >
+                {{ notification.msg }}
                 <button type="button" class="close" @click="removeNotification(notification, key)">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -38,6 +38,27 @@ export default {
         }
     },
     methods: {
+        addError (msg) {
+            this.cookyNotifications.push({
+                msg: msg,
+                class: 'alert-danger',
+            })
+        },
+        addOkay (msgText) {
+            const msg = {
+                msg: msgText,
+                class: 'alert-success cookyFadeoutAlert',
+            }
+
+            this.cookyNotifications.push(msg)
+            var me = this
+            setTimeout(function () {
+                const idx = me.cookyNotifications.indexOf(msg)
+                if (idx !== -1) {
+                    me.cookyNotifications.splice(idx, 1)
+                }
+            }, 3000)
+        },
         removeNotification (notification, key) {
             this.cookyNotifications.pop(notification)
         },
@@ -63,6 +84,16 @@ body {background-color:#FBFAF0}
     position: fixed;
     margin : auto;
     top: 0;
+}
+
+.cookyFadeoutAlert {
+    animation: alertFadeOut 3s;
+}
+
+@keyframes alertFadeOut {
+  0% { opacity: 1; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 a.nav-item-style:hover {

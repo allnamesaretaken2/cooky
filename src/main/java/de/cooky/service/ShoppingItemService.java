@@ -85,13 +85,19 @@ public class ShoppingItemService {
 		return shoppingItem;
 	}
 
-	public List<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
+	public SaveStatistics<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
+
+		long start = System.currentTimeMillis();
 
 		int order = 0;
 		for (ShoppingItem shoppingItem : list) {
 			shoppingItem.setItemOrder(order++);
 		}
 
-		return shoppingItemRepo.saveAll(list);
+		long end = System.currentTimeMillis();
+
+		List<ShoppingItem> entities = shoppingItemRepo.saveAll(list);
+
+		return new SaveStatistics<>(entities, end - start);
     }
 }
