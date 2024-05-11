@@ -26,20 +26,21 @@
             <tbody>
                 <tr v-for="(item,key) in items" :key="key" draggable="true" @mousemove="blorp" @dragend="finishDrag"
                     @dragenter="changeOrder(item)" @dragstart="startDrag(item)">
-                    <td class="p-2" ref="shoppingItemName" @click="changeEditMode(item, key, 'Name')">
+                    <td class="p-2" ref="shoppingItemName" @click="setEditMode(item, key, 'Name')">
                         <input v-if="item.isEditable" v-model="item.name" type="text" style="width: 100%;" @keypress="onEnterKey(item, $event)">
                         <div v-else>{{item.name}}</div>
                     </td>
-                    <td class="p-2" ref="shoppingItemAmount" @click="changeEditMode(item, key, 'Amount')">
+                    <td class="p-2" ref="shoppingItemAmount" @click="setEditMode(item, key, 'Amount')">
                         <input v-if="item.isEditable" v-model="item.amount" type="number" style="width: 100%;" @keypress="onEnterKey(item, $event)">
                         <div v-else>{{item.amount}}</div>
                     </td>
-                    <td class="p-2" ref="shoppingItemUnit" @click="changeEditMode(item, key, 'Unit')">
+                    <td class="p-2" ref="shoppingItemUnit" @click="setEditMode(item, key, 'Unit')">
                         <input v-if="item.isEditable" v-model="item.unit" type="text" style="width: 100%;" @keypress="onEnterKey(item, $event)">
                         <div v-else>{{item.unit}}</div>
                     </td>
                     <td class="p-2 " >
                         <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditMode(item, key)" />
+                        <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditModeAndReset(item, key)" />
                         <button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" />
                     </td>
                 </tr>
@@ -64,6 +65,9 @@ export default {
             itemEdit: null,
             previousEditedItem: null,
             addItemEventActive: false,
+
+            // used to reset the values of a shopping item if the input is cancelled
+            oldInputValues: null,
         }
     },
 
@@ -107,12 +111,29 @@ export default {
             }
         },
         removeEditMode (shoppingItem, key) {
-            if (shoppingItem.id === undefined && !shoppingItem.name) {
-                this.items.splice(key, 1)
-            }
             shoppingItem.isEditable = false
+
+            if (shoppingItem.id === undefined && !shoppingItem.name) {
+                // if nothing was written in this item we can remove it imediately
+                this.items.splice(key, 1)
+                return
+            }
+
+            if (shoppingItem.id === undefined ||
+                 shoppingItem.name !== this.oldInputValues.name ||
+                 shoppingItem.unit !== this.oldInputValues.unit ||
+                 shoppingItem.amount !== this.oldInputValues.amount) {
+                // only save the item if it is new or any of the important values has changed
+                this.saveList()
+            }
         },
-        changeEditMode (shoppingItem, key, refKey) {
+        removeEditModeAndReset (shoppingItem, key) {
+            this.removeEditMode(shoppingItem, key)
+            shoppingItem.name = this.oldInputValues.name
+            shoppingItem.amount = this.oldInputValues.amount
+            shoppingItem.unit = this.oldInputValues.unit
+        },
+        setEditMode (shoppingItem, key, refKey) {
             if (this.addItemEventActive !== false) {
                 key += this.addItemEventActive
                 this.items.splice(key, 0, { isEditable: true })
@@ -122,6 +143,11 @@ export default {
                     this.previousEditedItem.isEditable = false
                 }
                 shoppingItem.isEditable = true
+                this.oldInputValues = {
+                    name: shoppingItem.name,
+                    amount: shoppingItem.amount,
+                    unit: shoppingItem.unit,
+                }
                 this.previousEditedItem = shoppingItem
             }
 
@@ -129,9 +155,10 @@ export default {
                 this.$refs['shoppingItem' + refKey][key].getElementsByTagName('input')[0].focus()
             })
         },
-        onEnterKey (shoppingItem, event) {
+        async onEnterKey (shoppingItem, event) {
             if (event.key === 'Enter') {
                 shoppingItem.isEditable = false
+                await this.saveList()
                 this.addNewItem()
             }
         },

@@ -55,6 +55,8 @@ export default {
             setTimeout(function () {
                 const idx = me.cookyNotifications.indexOf(msg)
                 if (idx !== -1) {
+                    // seems like vue recreates the list and therfor re-adds all items which resets the keyframe-timer
+                    // and theirfor the whole animation
                     me.cookyNotifications.splice(idx, 1)
                 }
             }, 3000)
