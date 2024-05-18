@@ -12,14 +12,7 @@
             </div>
         </div> <!-- header -->
         <router-view />
-        <div class="cookyAlertContainer">
-            <div v-for="(notification,key) in cookyNotifications" :key="key" :class="'alert alert-dismissible ' + notification.class" >
-                {{ notification.msg }}
-                <button type="button" class="close" @click="removeNotification(notification, key)">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        </div>
+        <div class="cookyAlertContainer" id="alertContainer" />
         <modal-import-recipe ref="modalImportRecipe" :callback="openRecipeInEditMode" />
     </div>
 </template>
@@ -34,34 +27,63 @@ export default {
     },
     data () {
         return {
-            cookyNotifications: [],
+            count: 0,
         }
     },
     methods: {
         addError (msg) {
-            this.cookyNotifications.push({
-                msg: msg,
-                class: 'alert-danger',
-            })
+            this.addAlertToDiv('alert-danger', msg)
         },
         addOkay (msgText) {
-            const msg = {
-                msg: msgText,
-                class: 'alert-success cookyFadeoutAlert',
-            }
+            const alert = this.addAlertToDiv('alert-success', msgText)
 
-            this.cookyNotifications.push(msg)
-            var me = this
             setTimeout(function () {
-                const idx = me.cookyNotifications.indexOf(msg)
-                if (idx !== -1) {
-                    // seems like vue recreates the list and therfor re-adds all items which resets the keyframe-timer
-                    // and theirfor the whole animation
-                    me.cookyNotifications.splice(idx, 1)
-                }
+                const alertContainer = document.getElementById('alertContainer')
+                alertContainer.removeChild(alert)
             }, 3000)
         },
+        addAlertToDiv (styleClass, text) {
+            const alertContainer = document.getElementById('alertContainer')
+            // Create the div element
+            const alert = document.createElement('div')
+            alert.classList.add('alert', styleClass, 'alert-dismissible')
+            if (styleClass === 'alert-success') {
+                alert.classList.add('cookyFadeoutAlert')
+            }
+
+            // Add the text
+            alert.textContent = text
+
+            // Create the close button
+            const closeButton = document.createElement('button')
+            closeButton.setAttribute('type', 'button')
+            closeButton.classList.add('close')
+            closeButton.onclick = () => {
+                alert.remove()
+            }
+
+            // Create the span element for the "x" icon
+            const spanIcon = document.createElement('span')
+            spanIcon.setAttribute('aria-hidden', 'true')
+            spanIcon.innerHTML = '&times;'
+
+            // Append the span icon to the close button
+            closeButton.appendChild(spanIcon)
+
+            // Append the close button to the alert div
+            alert.appendChild(closeButton)
+
+            // Append the alert div to the parent div
+            if (alertContainer.children.length > 0) {
+                alertContainer.insertBefore(alert, alertContainer.children[0])
+            } else {
+                alertContainer.appendChild(alert)
+            }
+
+            return alert
+        },
         removeNotification (notification, key) {
+            // todo currently broken
             this.cookyNotifications.pop(notification)
         },
         openImportModal () {
@@ -80,7 +102,7 @@ export default {
 <style lang="scss">
 @import './styles/custom-bootstrap.scss';
 @import '../node_modules/bootstrap/scss/bootstrap.scss';
-body {background-color:#FBFAF0}
+body {background-color:var(--background)}
 
 .cookyAlertContainer {
     position: fixed;
@@ -108,4 +130,5 @@ a.nav-item-style:hover {
     /* border-width: 1px; */
     background-color: #aaaaaa44;
 }
+
 </style>

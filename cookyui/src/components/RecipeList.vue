@@ -184,6 +184,7 @@ export default {
             await window.cookyFetch('/rest/selectedentry/setorder', 'PUT', JSON.stringify(body))
 
             this.showLoadingSpinnerSelected = false
+            this.$root.addOkay('Order changed')
         },
 
         async addToShoppingList () {
@@ -197,6 +198,7 @@ export default {
         },
         finishDrag () {
             this.draggingItem = null
+            console.log('bljhdj')
             this.saveTemporarySelection()
         },
         changeOrder (item) {

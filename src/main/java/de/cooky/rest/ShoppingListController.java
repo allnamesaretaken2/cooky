@@ -4,6 +4,7 @@ import de.cooky.data.Recipe;
 import de.cooky.data.RecipeToShop;
 import de.cooky.data.SaveStatistics;
 import de.cooky.data.ShoppingItem;
+import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
 import de.cooky.repository.RecipeToShopRepository;
 import de.cooky.repository.ShoppingItemRepository;
@@ -32,7 +33,6 @@ public class ShoppingListController {
 
 	@GetMapping
 	public List<ShoppingItem> get() {
-
 		return shoppingListRepo.findAllByOrderByItemOrderAsc();
 	}
 
@@ -43,7 +43,6 @@ public class ShoppingListController {
 
 	@PostMapping
 	public SaveStatistics<ShoppingItem> save(@RequestBody List<ShoppingItem> list) {
-
 		return shoppingItemService.updateOrderAndSaveAll(list);
 	}
 	

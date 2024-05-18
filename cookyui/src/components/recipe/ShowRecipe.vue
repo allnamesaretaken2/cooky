@@ -4,11 +4,10 @@
             <div class="col-8 col-xl-8">
                 <h3>{{ recipe.name }}</h3>
             </div>
-            <div class="col-3 ml-auto">
-                <h4><i class="fa fa-check-square-o" @click="showStuff()" >Zutaten abhaken</i></h4>
-            </div>
-            <div class="col-1 ml-auto text-right">
-                <h4><i class="fa fa-edit" @click="$emit('toggleEditMode')" /></h4>
+            <div class="col-4 ml-auto text-right">
+                <button type="button" class="btn btn-secondary fa fa-plus mr-1" @click="$emit('toggleEditMode')" />
+                <button type="button" class="btn btn-secondary fa fa-check-square-o mr-1" @click="showStuff()" >Zutaten abhaken</button>
+                <button type="button" class="btn btn-secondary fa fa-edit" @click="$emit('toggleEditMode')" />
             </div>
         </div>
         <div class="row">

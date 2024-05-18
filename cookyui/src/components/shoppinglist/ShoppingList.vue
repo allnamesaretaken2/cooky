@@ -24,7 +24,7 @@
                 <th width="110px" />
             </thead>
             <tbody>
-                <tr v-for="(item,key) in items" :key="key" draggable="true" @mousemove="blorp" @dragend="finishDrag"
+                <tr v-for="(item,key) in items" :key="key" draggable="true" @mousemove="setPositionOfAddBar" @dragend="finishDrag"
                     @dragenter="changeOrder(item)" @dragstart="startDrag(item)">
                     <td class="p-2" ref="shoppingItemName" @click="setEditMode(item, key, 'Name')">
                         <input v-if="item.isEditable" v-model="item.name" type="text" style="width: 100%;" @keypress="onEnterKey(item, $event)">
@@ -40,7 +40,6 @@
                     </td>
                     <td class="p-2 " >
                         <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditMode(item, key)" />
-                        <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditModeAndReset(item, key)" />
                         <button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" />
                     </td>
                 </tr>
@@ -80,7 +79,7 @@ export default {
         finishDrag () {
             this.saveList()
         },
-        blorp (event) {
+        setPositionOfAddBar (event) {
             var rect = event.currentTarget.getBoundingClientRect()
             const hugosStyle = this.$refs.hugo.style
 
@@ -126,12 +125,6 @@ export default {
                 // only save the item if it is new or any of the important values has changed
                 this.saveList()
             }
-        },
-        removeEditModeAndReset (shoppingItem, key) {
-            this.removeEditMode(shoppingItem, key)
-            shoppingItem.name = this.oldInputValues.name
-            shoppingItem.amount = this.oldInputValues.amount
-            shoppingItem.unit = this.oldInputValues.unit
         },
         setEditMode (shoppingItem, key, refKey) {
             if (this.addItemEventActive !== false) {
@@ -219,16 +212,10 @@ export default {
         },
         async removeItem (item, key) {
             if (item.id) {
-                try {
-                    await fetch('/rest/shoppinglist/' + item.id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
-
-                    this.items.splice(key, 1)
-                } catch (error) {
-                    console.log('Error: ', error)
-                }
-            } else {
-                this.items.splice(key, 1)
+                await window.cookyFetch('/rest/shoppinglist/' + item.id, 'DELETE')
+                this.$root.addOkay('gelöscht')
             }
+            this.items.splice(key, 1)
         },
         startDrag (item) {
             this.draggingItem = item
