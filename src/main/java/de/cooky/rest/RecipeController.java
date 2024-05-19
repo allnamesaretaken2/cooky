@@ -39,11 +39,6 @@ public class RecipeController {
 		}
 	}
 
-	@GetMapping("/selected")
-	public List<Recipe> getSelected() {
-		return recipeRepo.findBySelected(true);
-	}
-
 	@GetMapping("{idRecipe}")
 	public Recipe getOne(@PathVariable Long idRecipe) {
 
@@ -84,6 +79,11 @@ public class RecipeController {
 		Recipe result = chefkochImportService.importRecipe(importObject.url);
 
 		return ResponseEntity.ok(result);
+	}
+
+	@GetMapping("/getSelected")
+	public List<Recipe> getSelected(){
+		return recipeService.getSelected();
 	}
 
 	static class Import {

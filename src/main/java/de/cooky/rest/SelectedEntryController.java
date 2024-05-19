@@ -20,7 +20,6 @@ public class SelectedEntryController {
 
     @GetMapping
     public Set<SelectedEntry> getAll(){
-
         return selectedEntryService.getAll();
     }
 

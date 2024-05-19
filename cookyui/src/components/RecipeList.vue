@@ -33,8 +33,6 @@
                     <span class="sr-only">Loading...</span>
                 </div>
             </div>
-
-            <button type="button" class="btn btn-secondary" @click="addToShoppingList()">Zutaten in EK-Liste übernehmen</button>
         </div>
 
         <div class="col-12 col-md-6">
@@ -190,7 +188,6 @@ export default {
         async addToShoppingList () {
             const recipeIds = []
             this.selectedEntries.forEach(entry => { if (entry.idRecipe) { recipeIds.push(entry.idRecipe) } })
-            await window.cookyFetch('/rest/shoppinglist/enhance', 'PUT', JSON.stringify(recipeIds))
         },
 
         startDrag (item) {

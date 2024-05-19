@@ -1,17 +1,17 @@
 package de.cooky.service;
 
-import de.cooky.data.Ingredient;
-import de.cooky.data.IngredientToRecipePart;
-import de.cooky.data.Recipe;
-import de.cooky.data.RecipePart;
+import de.cooky.data.*;
 import de.cooky.repository.RecipeRepository;
+import de.cooky.repository.SelectedEntryRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -22,6 +22,9 @@ public class RecipeService {
 
 	@Autowired
 	private IngredientService ingredientService;
+
+	@Autowired
+	private SelectedEntryRepository selectedEntryRepo;
 
 	public Recipe create(Recipe recipe) {
 
@@ -79,5 +82,14 @@ public class RecipeService {
 		recipe = recipeRepo.save(recipe);
 
 		return recipe;
+	}
+
+    public List<Recipe> getSelected() {
+
+		Set<SelectedEntry> selectedRecipeEntries = selectedEntryRepo.getAllByIdRecipeIsNotNullOrderBySortOrder();
+
+		List<Long> recipeIds = selectedRecipeEntries.stream().map(SelectedEntry::getIdRecipe).collect(Collectors.toList());
+
+		return recipeRepo.findAllById(recipeIds);
 	}
 }

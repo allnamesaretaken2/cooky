@@ -1,54 +1,41 @@
 package de.cooky.service;
 
-import de.cooky.data.*;
-import de.cooky.repository.RecipeRepository;
-import de.cooky.repository.RecipeToShopRepository;
+import de.cooky.data.IngredientToRecipePart;
+import de.cooky.data.SaveStatistics;
+import de.cooky.data.ShoppingItem;
+import de.cooky.repository.IngredientToRecipePartRepository;
 import de.cooky.repository.ShoppingItemRepository;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class ShoppingItemService {
 
 	@Autowired
-	private RecipeRepository recipeRepo;
-
-	@Autowired
 	private ShoppingItemRepository shoppingItemRepo;
-	
+
 	@Autowired
-	private RecipeToShopRepository recipeToShopRepo;
+	private IngredientToRecipePartRepository ingrRepo;
 
-	public void enhanceShoppingList(List<Long> recipeIdsAsArray) {
+	public Pair<Integer, Integer> enhanceShoppingListByIngredients(List<Long> ingredientIds) {
 
-		List<RecipeToShop> all = recipeToShopRepo.findAll();
-		List<Long> recipesWeAlreadyKnow = all.stream().map(RecipeToShop::getIdRecipe).collect(Collectors.toList());
-
-		List<Long> recipeIds = new ArrayList<>(recipeIdsAsArray);
-
-		//ignore those we already have in our list
-		recipeIds.removeAll(recipesWeAlreadyKnow);
-
-		List<Recipe> recipesToBeCooked = recipeRepo.findAllById(recipeIds);
+		List<IngredientToRecipePart> ingredients = ingrRepo.findAllById(ingredientIds);
+		Set<String> ingrNames = ingredients.stream().map(ingr -> ingr.getIngredient().getName()).collect(Collectors.toSet());
 
 		Map<String, List<IngredientToRecipePart>> ingredientNames = new HashMap<>();
-
-		for(Recipe recipe : recipesToBeCooked) {
-			for (RecipePart part : recipe.getRecipeParts()) {
-				for (IngredientToRecipePart itr : part.getIngredients()) {
-                    List<IngredientToRecipePart> list = ingredientNames.computeIfAbsent(itr.getIngredient().getName(), k -> new ArrayList<>());
-                    list.add(itr);
-				}
-			}
+		for (IngredientToRecipePart itr : ingredients) {
+			List<IngredientToRecipePart> list = ingredientNames.computeIfAbsent(itr.getIngredient().getName(), k -> new ArrayList<>());
+			list.add(itr);
 		}
 
-		List<ShoppingItem> items = shoppingItemRepo.findByNameIn(ingredientNames.keySet());
+		List<ShoppingItem> items = shoppingItemRepo.findByNameIn(ingrNames);
+
+		int countOfNewItems = 0;
+		int countOfUpdatedItems = 0;
 
 		for(Map.Entry<String, List<IngredientToRecipePart>> entry : ingredientNames.entrySet()){
 
@@ -65,14 +52,16 @@ public class ShoppingItemService {
 				}
 				shoppingItem.setUnit(itrp.getUnit());
 			}
+			if(shoppingItem.getId() == null){
+				countOfNewItems++;
+			}else{
+				countOfUpdatedItems++;
+			}
 		}
 
 		updateOrderAndSaveAll(items);
-		for(Long idRecipe : recipeIds){
-			RecipeToShop shop = new RecipeToShop();
-			shop.setIdRecipe(idRecipe);
-			recipeToShopRepo.save(shop);
-		}
+
+		return Pair.of(countOfNewItems, countOfUpdatedItems);
 	}
 
 	private static ShoppingItem getShoppingItemByIngredientName(List<ShoppingItem> items, String ingredientName) {
@@ -85,6 +74,9 @@ public class ShoppingItemService {
 		return shoppingItem;
 	}
 
+	/**
+	 * This is faulty as we updae only a subset of the shopping items. But shopping items are way more there
+	 */
 	public SaveStatistics<ShoppingItem> updateOrderAndSaveAll(List<ShoppingItem> list) {
 
 		long start = System.currentTimeMillis();

@@ -1,19 +1,17 @@
 package de.cooky.rest;
 
-import de.cooky.data.Recipe;
-import de.cooky.data.RecipeToShop;
 import de.cooky.data.SaveStatistics;
 import de.cooky.data.ShoppingItem;
-import de.cooky.exceptions.CookyErrorMsg;
 import de.cooky.repository.RecipeRepository;
-import de.cooky.repository.RecipeToShopRepository;
 import de.cooky.repository.ShoppingItemRepository;
 import de.cooky.service.ShoppingItemService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/rest/shoppinglist")
@@ -26,9 +24,6 @@ public class ShoppingListController {
 	private ShoppingItemService shoppingItemService;
 
 	@Autowired
-	private RecipeToShopRepository recipeToShopRepo;
-
-	@Autowired
 	private RecipeRepository recipeRepo;
 
 	@GetMapping
@@ -37,8 +32,15 @@ public class ShoppingListController {
 	}
 
 	@PutMapping("/enhance")
-	public void enhance(@RequestBody List<Long> recipeIds){
-		shoppingItemService.enhanceShoppingList(recipeIds);
+	@Deprecated
+	public Map<String, Object> enhance(@RequestBody List<Long> ingredientToRecipeIds) {
+		Pair<Integer, Integer> countOfNewAndUpdatedItems = shoppingItemService.enhanceShoppingListByIngredients(ingredientToRecipeIds);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("new", countOfNewAndUpdatedItems.getLeft());
+		result.put("updated", countOfNewAndUpdatedItems.getRight());
+
+		return result;
 	}
 
 	@PostMapping
@@ -54,13 +56,5 @@ public class ShoppingListController {
 	@DeleteMapping
 	public void delete() {
 		shoppingListRepo.deleteAll();
-		recipeToShopRepo.deleteAll();
-	}
-
-	@GetMapping("/getRecipeNamesWeAlreadyAddedToTheShoppingList")
-	public List<String> getRecipeNamesWeAlreadyAddedToTheShoppingList(){
-		List<Long> recipeIds = recipeToShopRepo.findAll().stream().map(RecipeToShop::getIdRecipe).collect(Collectors.toList());
-
-		return recipeRepo.findAllById(recipeIds).stream().map(Recipe::getName).collect(Collectors.toList());
 	}
 }

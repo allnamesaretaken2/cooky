@@ -5,6 +5,7 @@
             <div class="col">
                 <div class="nav py-2" style="background-color:#005B4C; color:#FBFAF0;">
                     <router-link to="/" class="mx-1 px-1 nav-item-style">Rezepte</router-link>
+                    <router-link to="/transferIngredients" class="mx-1 px-1 nav-item-style" >Items übernehmen</router-link>
                     <router-link to="/shoppinglist" class="mx-1 px-1 nav-item-style" >Einkaufsliste</router-link>
                     <a class="mx-1 px-1 nav-item-style" @click="openImportModal()">Import</a>
                     <a class="mx-1 px-1 nav-item-style" @click="addRecipe()">Neu</a>

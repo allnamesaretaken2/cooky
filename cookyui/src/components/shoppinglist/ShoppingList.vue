@@ -5,11 +5,6 @@
                 We added the ingredients of the following recipes:
             </div>
         </div>
-        <div class="row">
-            <ul>
-                <li v-for="(recipeName, key) in recipeNames" :key="key" >{{ recipeName }}</li>
-            </ul>
-        </div>
         <div class="row m-1 stickybuttons">
             <button type="button" class="btn btn-secondary m-1" @click="clearList()">Leeren</button>
             <button type="button" class="btn btn-secondary m-1" @click="saveList()">Speichern</button>
@@ -58,7 +53,6 @@ export default {
     data () {
         return {
             items: [],
-            recipeNames: [],
             draggingItem: null,
             // the item that is currently edited in the edit-popup
             itemEdit: null,
@@ -72,7 +66,6 @@ export default {
 
     mounted: function () {
         this.getShoppingItems()
-        this.getRecipeNamesWeAlreadyAddedToTheShoppingList()
     },
 
     methods: {
@@ -196,7 +189,6 @@ export default {
         async clearList () {
             await window.cookyFetch('/rest/shoppinglist/', 'DELETE')
             this.items = []
-            this.recipeNames = []
         },
         addNewItem () {
             this.itemEdit = {
@@ -238,12 +230,6 @@ export default {
             const json = await response.json()
 
             this.items = json
-        },
-        async getRecipeNamesWeAlreadyAddedToTheShoppingList () {
-            const response = await window.cookyFetch('/rest/shoppinglist/getRecipeNamesWeAlreadyAddedToTheShoppingList', 'GET')
-            const json = await response.json()
-
-            this.recipeNames = json
         },
     },
 }
