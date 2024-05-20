@@ -33,7 +33,7 @@ public class Recipe {
 	private Integer durationInMinutes;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@OrderBy("id ASC")
+	@OrderBy("itemOrder ASC")
 	@JoinColumn(name = "id_recipe")
 	private Set<RecipePart> recipeParts = new LinkedHashSet<>();
 	

@@ -21,6 +21,8 @@ public class RecipePart {
     @Column(length = 4000)
     private String description;
 
+    private Integer itemOrder;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("order ASC")
     @JoinColumn(name = "id_recipepart")
@@ -60,6 +62,14 @@ public class RecipePart {
 
     public Set<IngredientToRecipePart> getIngredients() {
         return ingredients;
+    }
+
+    public void setItemOrder(Integer itemOrder) {
+        this.itemOrder = itemOrder;
+    }
+
+    public Integer getItemOrder() {
+        return itemOrder;
     }
 
     public void setIngredients(Set<IngredientToRecipePart> ingredients) {

@@ -5,7 +5,6 @@
                 <h3>{{ recipe.name }}</h3>
             </div>
             <div class="col-4 ml-auto text-right">
-                <button type="button" class="btn btn-secondary fa fa-plus mr-1" @click="$emit('toggleEditMode')" />
                 <button type="button" class="btn btn-secondary fa fa-check-square-o mr-1" @click="showStuff()" >Zutaten abhaken</button>
                 <button type="button" class="btn btn-secondary fa fa-edit" @click="$emit('toggleEditMode')" />
             </div>

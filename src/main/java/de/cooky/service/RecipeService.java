@@ -39,11 +39,13 @@ public class RecipeService {
 		}
 
 		//also recreate the order so that it fixes gaps or other issues in the list
+		int partCounter = 0;
 		for(RecipePart part : recipe.getRecipeParts()){
 			if(part.getIngredients()== null){
 				continue;
 			}
 
+			part.setItemOrder(partCounter++);
 			int counter = 0;
 
 			Set<IngredientToRecipePart> ingredientToRecipeParts = part.getIngredients();

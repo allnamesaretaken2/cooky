@@ -24,8 +24,9 @@
             </div>
         </div>
         <button class="btn btn-secondary form-control fa fa-plus my-1" @click="addPart()" v-if="!anyPartsExisting"></button>
-        <div v-for="(recipePart, recipePartIndex) in recipe.recipeParts" :key="'recipePart'+recipePart.id">
-            <div class="form-row mt-4" style="background-color:#AFBC6C" >
+        <div v-for="(recipePart, recipePartIndex) in recipe.recipeParts" :key="'recipePart'+recipePart.id" >
+            <div class="form-row mt-4" style="background-color:#AFBC6C" draggable="true"
+                 @dragstart="startDragOfRecipePart(recipePart)" @dragend="finishDragOfRecipePart" @dragenter="changeOrderOFRecipePart(recipePart)">
                 <div class="col-12 col-sm-3 col-xl-2 col-form-label">
                     <b>Schritt</b>
                 </div>
@@ -42,7 +43,7 @@
                     <table class="table table-hover">
                         <tbody ref="ingredientList">
                             <tr v-for="(ingredient,ingredientIndex) in recipePart.ingredients" :key="'ingredient'+ingredientIndex" draggable="true"
-                                @dragstart="startDrag(recipePart, ingredient)" @drop="finishDrag" @dragenter="changeOrder(recipePart, ingredient)" class="form-row">
+                                @dragstart="startDrag(recipePart, ingredient)" @dragend="finishDrag" @dragenter="changeOrder(recipePart, ingredient)" class="form-row">
                                 <td class="input-group col-3">
                                     <input v-model="ingredient.amount" type="number" class="form-control w-50 w-lg-75">
                                     <input v-model="ingredient.unit" type="text" class="form-control w-lg-25">
@@ -102,6 +103,7 @@ export default {
             recipe: {},
             existingIngredients: [],
             draggedIngredient: null,
+            draggedRecipePart: null,
         }
     },
     computed: {
@@ -140,6 +142,7 @@ export default {
                 const recipe = await response.json()
                 this.$emit('toggleEditMode', recipe.id)
             }
+            this.$root.addOkay('recipe saved')
         },
         addPart (recipePartIndex) {
             if (!this.recipe.recipeParts) {
@@ -192,6 +195,11 @@ export default {
             this.draggedIngredientRecipePart = null
         },
         changeOrder (recipePart, ingredient) {
+            if (!this.draggedIngredient) {
+                // only do something if an ingredient is currently dragged
+                return
+            }
+
             if (recipePart === this.draggedIngredientRecipePart) {
                 // dragging within a recipe part
                 const newIndex = recipePart.ingredients.indexOf(ingredient)
@@ -210,6 +218,27 @@ export default {
                 // draggedIngredient recipe part has now changed
                 this.draggedIngredientRecipePart = recipePart
             }
+        },
+        startDragOfRecipePart (recipePart) {
+            if (!this.draggedIngredient) {
+                // if there's already an ingredient currently dragged leave the recipe part where it is
+                // (because of event propagation both elements could, in theory, be dragged)
+                this.draggedRecipePart = recipePart
+            }
+        },
+        finishDragOfRecipePart () {
+            this.draggredRecipePart = null
+        },
+        changeOrderOFRecipePart (recipePart) {
+            if (!this.draggedRecipePart) {
+                return
+            }
+
+            const newIndex = this.recipe.recipeParts.indexOf(recipePart)
+            const oldIndex = this.recipe.recipeParts.indexOf(this.draggedRecipePart)
+
+            this.recipe.recipeParts[newIndex] = this.draggedRecipePart
+            this.recipe.recipeParts[oldIndex] = recipePart
         },
         /**
          * @param {Object} recipePart the recipe part to which the ingredients will be added
