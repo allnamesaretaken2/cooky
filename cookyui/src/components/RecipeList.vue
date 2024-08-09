@@ -1,12 +1,11 @@
 <template>
     <div class="row">
         <div class="col-12 col-md-6">
-            <h4 class="mt-2">Das wollen wir demnächst kochen</h4>
-
-            <div>
+            <div class="row px-3">
+                <h4 class="mt-2">Das wollen wir demnächst kochen</h4>
+                <div style="flex: auto;" />
                 <button class="btn btn-secondary" @click="unselectAll()">Leeren</button>
             </div>
-
             <table class="table table-hover">
                 <thead style="background-color:#AFBC6C">
                     <th class="py-2">Name</th>
@@ -37,11 +36,21 @@
 
         <div class="col-12 col-md-6">
 
-            <h4 class="mt-2">Rezepte</h4>
-
-            <div>
-                <input v-model="searchText" type="text" class="col-4">
-                <button class="btn btn-secondary " @click="getRecipeList()">Suchen</button>
+            <div class="row px-3">
+                <h4 class="mt-2">Rezepte</h4>
+                <div style="flex: auto;" />
+                <button type="button" class="btn btn-secondary fa fa-search-plus " @click="showSearchAreaFn" />
+            </div>
+            <div class="row border border-success py-1" v-if="showSearchArea" style="background-color: rgba(175, 188, 108, 0.5); margin: 1px">
+                <h5 class="px-2">Suche nach...</h5>
+                <div class="col-12 d-flex">
+                    <span style="width:170px">Zutaten</span>
+                    <input v-model="searchTextIngredient" type="text" style="width: 100%;">
+                </div>
+                <div class="col-12 d-flex py-1">
+                    <span style="width:170px">Rezept</span>
+                    <input v-model="searchText" type="text" style="width: 100%;">
+                </div>
             </div>
 
             <table class="table table-hover">
@@ -93,9 +102,11 @@ export default {
             recipes: [],
             selectedEntries: [],
             searchText: null,
+            searchTextIngredient: null,
             showLoadingSpinner: false,
             showLoadingSpinnerSelected: false,
             draggingItem: null,
+            showSearchArea: false,
         }
     },
     mounted: function () {
@@ -104,18 +115,41 @@ export default {
     },
     computed: {
         filteredRecipes: function () {
-            if (!this.searchText) {
-                return this.recipes
+            let result = this.recipes
+
+            if (this.searchText) {
+                const filterText = this.searchText.toLowerCase()
+                result = result.filter(recipe => {
+                    return recipe.name.toLowerCase().indexOf(filterText) !== -1
+                })
             }
 
-            const filterText = this.searchText.toLowerCase()
+            if (this.searchTextIngredient) {
+                const textIngredients = this.searchTextIngredient.toLowerCase()
+                result = result.filter(recipe => {
+                    if (!recipe.recipeParts) {
+                        return false
+                    }
+                    const foundParts = recipe.recipeParts.filter(part => {
+                        if (!part.ingredients) {
+                            return false
+                        }
+                        const foundingredients = part.ingredients.filter(ing => {
+                            return ing.ingredient.name.toLowerCase().indexOf(textIngredients) !== -1
+                        })
+                        return foundingredients.length > 0
+                    })
+                    return foundParts.length > 0
+                })
+            }
 
-            return this.recipes.filter(recipe => {
-                return recipe.name.toLowerCase().indexOf(filterText) !== -1
-            })
+            return result
         },
     },
     methods: {
+        showSearchAreaFn () {
+            this.showSearchArea = !this.showSearchArea
+        },
         async getRecipeList () {
             this.recipes = []
 

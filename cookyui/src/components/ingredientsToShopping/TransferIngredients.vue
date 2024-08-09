@@ -114,6 +114,16 @@ export default {
             const response = await window.cookyFetch('/rest/shoppinglist/enhance', 'PUT', JSON.stringify(selectedIngredientIds))
             const newAndUpdated = await response.json()
             this.$root.addOkay('Created ' + newAndUpdated.new + ' items. Updated ' + newAndUpdated.updated + ' items')
+
+            this.selectedEntries.forEach(recipe => {
+                recipe.recipeParts.forEach(part => {
+                    part.ingredients.forEach(ingr => {
+                        if (ingr.selectForShopping) {
+                            ingr.selectForShopping = null
+                        }
+                    })
+                })
+            })
         },
     },
 }
