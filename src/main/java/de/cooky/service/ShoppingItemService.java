@@ -5,6 +5,7 @@ import de.cooky.data.SaveStatistics;
 import de.cooky.data.ShoppingItem;
 import de.cooky.repository.IngredientToRecipePartRepository;
 import de.cooky.repository.ShoppingItemRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -86,9 +87,11 @@ public class ShoppingItemService {
 			shoppingItem.setItemOrder(order++);
 		}
 
-		long end = System.currentTimeMillis();
+		list.removeIf(item -> StringUtils.isEmpty(item.getName()));
 
 		List<ShoppingItem> entities = shoppingItemRepo.saveAll(list);
+
+		long end = System.currentTimeMillis();
 
 		return new SaveStatistics<>(entities, end - start);
     }
