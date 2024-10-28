@@ -21,7 +21,7 @@
                             </div>
                             <div class="col-4" style="text-align: right;">
                                 <button type="button" class="btn btn-primary" @click="createShoppingItems()" >
-                                    Selektierte in EK-Liste übernehmen
+                                    {{selectionSize}} selektierte in EK-Liste übernehmen
                                 </button>
                             </div>
                         </div>
@@ -48,6 +48,7 @@ export default {
             selectedEntries: null,
             recipe: null,
             ingredients: null,
+            selectionSize: null,
         }
     },
 
@@ -96,6 +97,11 @@ export default {
          */
         selectIngredient (ingredient) {
             ingredient.selectForShopping = !ingredient.selectForShopping
+            if (ingredient.selectForShopping) {
+                this.selectionSize++
+            } else {
+                this.selectionSize--
+            }
         },
 
         async createShoppingItems () {

@@ -11,11 +11,12 @@
                     <th class="py-2">Name</th>
                     <th class="py-2">Actions</th>
                 </thead>
-                <tbody>
+                <tbody >
                     <tr v-for="(recipe,key) in selectedEntries" :key="key" draggable="true" @dragend="finishDrag"
-                        @dragenter="changeOrder(recipe)" @dragstart="startDrag(recipe, key)">
+                        @dragstart="startDrag(recipe, key)" @dragenter="changeOrder(recipe)"
+                        @touchstart="startDrag(recipe, key)" @touchmove="movetouch" @touchend="finishDrag">
                         <td @click="openRecipe(recipe.idRecipe)">
-                            <h5>{{ recipe.frontendText }}</h5>
+                            <h5 :itemId="recipe.id" >{{ recipe.frontendText }}</h5>
                             <span v-if="recipe.comment" class="commentColor">{{recipe.comment}}</span>
                         </td>
                         <td class="text-right" style="width: 110px">
@@ -149,6 +150,10 @@ export default {
     methods: {
         showSearchAreaFn () {
             this.showSearchArea = !this.showSearchArea
+            if (!this.showSearchArea) {
+                this.searchTextIngredient = null
+                this.searchText = null
+            }
         },
         async getRecipeList () {
             this.recipes = []
@@ -229,7 +234,6 @@ export default {
         },
         finishDrag () {
             this.draggingItem = null
-            console.log('bljhdj')
             this.saveTemporarySelection()
         },
         changeOrder (item) {
@@ -239,6 +243,29 @@ export default {
             this.selectedEntries[newIndex] = this.draggingItem
             this.selectedEntries[oldIndex] = item
         },
+
+        movetouch (event) {
+            const x = event.touches[0].clientX
+            const y = event.touches[0].clientY
+            const element = document.elementFromPoint(x, y)
+
+            const itemIdAsString = element.getAttribute('itemId')
+            if (itemIdAsString) {
+                const itemId = parseInt(itemIdAsString)
+                const item = this.selectedEntries.find(item => {
+                    return item.id === itemId
+                })
+                if (item) {
+                    this.changeOrder(item)
+                }
+            }
+
+            if (event) {
+                event.stopPropagation()
+                event.preventDefault()
+            }
+        },
+
         async deleteRecipe (recipe) {
             try {
                 await fetch('/rest/recipes/' + recipe.id, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } })
