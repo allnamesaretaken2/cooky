@@ -34,6 +34,7 @@
                         <div v-else>{{item.unit}}</div>
                     </td>
                     <td class="p-2 " >
+                        <button type="button" class="btn btn-secondary fa fa-arrows mr-1" :itemId="item.id" />
                         <button v-if="item.isEditable" type="button" class="btn btn-secondary fa fa-check" @click="removeEditMode(item, key)" />
                         <button type="button" class="btn btn-secondary fa fa-trash" @click="removeItem(item, key)" />
                     </td>

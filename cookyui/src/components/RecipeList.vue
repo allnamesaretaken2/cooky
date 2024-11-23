@@ -13,13 +13,14 @@
                 </thead>
                 <tbody >
                     <tr v-for="(recipe,key) in selectedEntries" :key="key" draggable="true" @dragend="finishDrag"
-                        @dragstart="startDrag(recipe, key)" @dragenter="changeOrder(recipe)"
-                        @touchstart="startDrag(recipe, key)" @touchmove="movetouch" @touchend="finishDrag">
+                        @dragstart="startDrag(recipe, key)" @dragenter="changeOrder(recipe)">
                         <td @click="openRecipe(recipe.idRecipe)">
-                            <h5 :itemId="recipe.id" >{{ recipe.frontendText }}</h5>
+                            <h5>{{ recipe.frontendText }}</h5>
                             <span v-if="recipe.comment" class="commentColor">{{recipe.comment}}</span>
                         </td>
-                        <td class="text-right" style="width: 110px">
+                        <td class="text-right" style="width: 160px">
+                            <button type="button" class="btn btn-secondary fa fa-arrows mr-1" :itemId="recipe.id"
+                                    @touchstart="startDrag(recipe, key)" @touchmove="movetouch" @touchend="finishDrag" />
                             <button type="button" class="btn btn-secondary fa fa-pencil-square-o mr-1" @click="setComment(recipe)" />
                             <button type="button" class="btn btn-secondary fa fa-arrow-circle-right" @click="deleteSelection(recipe)" />
                         </td>

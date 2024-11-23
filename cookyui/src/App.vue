@@ -9,6 +9,7 @@
                     <router-link to="/shoppinglist" class="mx-1 px-1 nav-item-style" >Einkaufsliste</router-link>
                     <a class="mx-1 px-1 nav-item-style" @click="openImportModal()">Import</a>
                     <a class="mx-1 px-1 nav-item-style" @click="addRecipe()">Neu</a>
+                    <router-link to="/supermarket" class="mx-1 px-1 nav-item-style" >Supermarkt</router-link>
                 </div>
             </div>
         </div> <!-- header -->
